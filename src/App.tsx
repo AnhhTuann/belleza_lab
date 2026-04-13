@@ -1,10 +1,73 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { UploadCloud, Image as ImageIcon, Palette, Droplet, RefreshCw, Sparkles, AlertTriangle, Wand2, CheckCircle, Info, MessageCircle, Send, Award, Download } from 'lucide-react';
+import { UploadCloud, Image as ImageIcon, Palette, Droplet, RefreshCw, Sparkles, AlertTriangle, Wand2, CheckCircle, Info, MessageCircle, Send, Award, Download, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import imageCompression from 'browser-image-compression';
 import chroma from 'chroma-js';
-import html2canvas from 'html2canvas';
+import { toPng } from 'html-to-image';
 import { analyzeArt, ArtAnalysisResult, FinalPaletteColor, chatWithBelle, ChatMessage } from './services/geminiService';
+
+const PaletteCard = ({ image, colors, critique, onClose }: { image: string, colors: FinalPaletteColor[], critique: string, onClose: () => void }) => {
+  const cardRef = useRef<HTMLDivElement>(null);
+  const [isDownloading, setIsDownloading] = useState(false);
+
+  const downloadCard = () => {
+    if (cardRef.current === null) return;
+    setIsDownloading(true);
+    toPng(cardRef.current, { cacheBust: true })
+      .then((dataUrl) => {
+        const link = document.createElement('a');
+        link.download = `Belleza-Lab-Palette.png`;
+        link.href = dataUrl;
+        link.click();
+      })
+      .finally(() => setIsDownloading(false));
+  };
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+      <div className="flex flex-col items-center relative">
+        <button onClick={onClose} className="absolute -top-10 right-0 text-white hover:text-gray-300 transition-colors">
+          <X size={24} />
+        </button>
+        {/* Khu vực Card để Render ảnh */}
+        <div 
+          ref={cardRef} 
+          className="w-[400px] p-6 bg-[#fdfcfb] border border-gray-200 shadow-xl font-serif text-[#2d2d2d]"
+        >
+          <h2 className="text-center text-xl tracking-widest uppercase mb-4 text-yellow-600 font-semibold">Belleza Lab</h2>
+          
+          <img src={image} className="w-full h-48 object-cover rounded-sm mb-4" alt="Artwork" crossOrigin="anonymous" />
+          
+          <div className="flex justify-between mb-6">
+            {colors.slice(0, 5).map((c, i) => (
+              <div key={i} className="flex flex-col items-center">
+                <div className="w-12 h-12 rounded-full mb-1 border border-black/5 shadow-sm" style={{ backgroundColor: c.hex }} />
+                <span className="text-[10px] font-sans uppercase text-gray-600">{c.hex}</span>
+              </div>
+            ))}
+          </div>
+
+          <div className="border-t border-gray-200 pt-4 italic text-sm text-center px-4 text-gray-700 leading-relaxed">
+            "{critique}"
+          </div>
+          
+          <p className="mt-6 text-center text-[10px] uppercase tracking-tighter text-gray-400 font-sans">
+            Analyzed by Belle • Professional Art Intelligence
+          </p>
+        </div>
+
+        <button 
+          onClick={downloadCard}
+          disabled={isDownloading}
+          className="mt-6 px-6 py-2 bg-gray-900 text-white rounded-full hover:bg-yellow-600 transition-colors font-sans text-sm flex items-center gap-2"
+        >
+          {isDownloading ? <RefreshCw size={16} className="animate-spin" /> : <Download size={16} />}
+          Tải Thẻ Màu Của Bạn
+        </button>
+      </div>
+    </div>
+  );
+};
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -56,12 +119,11 @@ export default function App() {
   const [base64Image, setBase64Image] = useState<string | null>(null);
   const [mimeType, setMimeType] = useState<string | null>(null);
   const [finalReviewText, setFinalReviewText] = useState<string | null>(null);
-  const [isGeneratingCert, setIsGeneratingCert] = useState(false);
+  const [showPaletteCard, setShowPaletteCard] = useState(false);
   
   const fileInputRef = useRef<HTMLInputElement>(null);
   const abortControllerRef = useRef<AbortController | null>(null);
   const chatEndRef = useRef<HTMLDivElement>(null);
-  const certificateRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     return () => {
@@ -213,32 +275,13 @@ export default function App() {
       setChatHistory(prev => [...prev, { role: 'model', text: responseText }]);
       if (isFinalReview) {
         setFinalReviewText(responseText);
+        setShowPaletteCard(true);
       }
     } catch (err) {
       console.error("Chat error:", err);
       setChatHistory(prev => [...prev, { role: 'model', text: "Xin lỗi Tuấn, Belle đang gặp chút sự cố kết nối. Bạn thử lại sau nhé!" }]);
     } finally {
       setIsChatting(false);
-    }
-  };
-
-  const downloadCertificate = async () => {
-    if (!certificateRef.current) return;
-    setIsGeneratingCert(true);
-    try {
-      const canvas = await html2canvas(certificateRef.current, { 
-        scale: 2, 
-        useCORS: true,
-        backgroundColor: '#ffffff'
-      });
-      const link = document.createElement('a');
-      link.download = 'belleza-lab-certificate.png';
-      link.href = canvas.toDataURL('image/png');
-      link.click();
-    } catch (err) {
-      console.error("Failed to generate certificate", err);
-    } finally {
-      setIsGeneratingCert(false);
     }
   };
 
@@ -662,12 +705,11 @@ export default function App() {
                             </button>
                             {finalReviewText && (
                               <button 
-                                onClick={downloadCertificate}
-                                disabled={isGeneratingCert}
+                                onClick={() => setShowPaletteCard(true)}
                                 className="text-xs bg-white hover:bg-gray-50 text-gray-800 px-4 py-2 rounded-full font-medium transition-colors shadow-sm border border-gray-200 flex items-center gap-1"
                               >
-                                {isGeneratingCert ? <RefreshCw size={14} className="animate-spin" /> : <Download size={14} />}
-                                Tải Certificate
+                                <ImageIcon size={14} />
+                                Xem Thẻ Màu
                               </button>
                             )}
                           </div>
@@ -701,52 +743,14 @@ export default function App() {
         )}
       </AnimatePresence>
 
-      {/* Hidden Certificate for Export */}
-      {analysisResult && imageSrc && (
-        <div className="absolute top-[-9999px] left-[-9999px]">
-          <div 
-            ref={certificateRef} 
-            className="w-[800px] bg-white p-10 flex flex-col items-center justify-center font-serif relative overflow-hidden"
-            style={{ backgroundImage: 'linear-gradient(135deg, #fdfbfb 0%, #ebedee 100%)' }}
-          >
-            {/* Decorative elements */}
-            <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-yellow-400 via-orange-300 to-yellow-400" />
-            <div className="absolute bottom-0 left-0 w-full h-2 bg-gradient-to-r from-yellow-400 via-orange-300 to-yellow-400" />
-            
-            <h1 className="text-4xl font-bold text-gray-900 mb-2 tracking-tight">Belleza Lab</h1>
-            <p className="text-lg text-gray-500 italic mb-8">Certificate of Completion</p>
-            
-            <div className="w-full flex gap-8 items-center mb-8">
-              <div className="flex-1">
-                <img src={imageSrc} alt="Artwork" className="w-full h-auto rounded-lg shadow-lg object-cover max-h-[400px]" crossOrigin="anonymous" />
-              </div>
-              <div className="w-1/3 flex flex-col gap-4">
-                <h3 className="text-xl font-semibold text-gray-800 border-b pb-2">Color Palette</h3>
-                <div className="flex flex-col gap-3">
-                  {analysisResult.current_colors.slice(0, 5).map((c, i) => (
-                    <div key={i} className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-full shadow-md border border-gray-200" style={{ backgroundColor: c.hex }} />
-                      <div>
-                        <div className="text-sm font-medium text-gray-800 capitalize">{c.name}</div>
-                        <div className="text-xs text-gray-500 font-mono">{c.hex}</div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-            
-            <div className="w-full bg-white/60 backdrop-blur-sm p-6 rounded-xl border border-gray-200 shadow-sm">
-              <div className="flex items-center gap-3 mb-3">
-                <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-yellow-400 to-orange-300 flex items-center justify-center text-white font-serif text-sm shadow-sm">B</div>
-                <h4 className="font-semibold text-gray-900">Belle's Note</h4>
-              </div>
-              <p className="text-gray-700 italic leading-relaxed whitespace-pre-wrap">
-                {finalReviewText || "Một tác phẩm tuyệt vời thể hiện sự nhạy bén trong việc sử dụng màu sắc và ánh sáng. Sự kết hợp các mảng màu tạo nên một tổng thể hài hòa và đầy cảm xúc."}
-              </p>
-            </div>
-          </div>
-        </div>
+      {/* Visible Palette Card Modal */}
+      {showPaletteCard && analysisResult && imageSrc && (
+        <PaletteCard 
+          image={imageSrc} 
+          colors={analysisResult.current_colors} 
+          critique={finalReviewText || "Một tác phẩm tuyệt vời thể hiện sự nhạy bén trong việc sử dụng màu sắc và ánh sáng."}
+          onClose={() => setShowPaletteCard(false)}
+        />
       )}
     </div>
   );
