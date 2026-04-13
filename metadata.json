@@ -1,0 +1,6 @@
+{
+  "name": "Belleza Lab",
+  "description": "A web application that analyzes paintings to extract color palettes, provide color mixing guides, and predict the medium using AI.",
+  "requestFramePermissions": [],
+  "majorCapabilities": []
+}
