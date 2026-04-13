@@ -104,6 +104,65 @@ const ArtLoader = () => (
   </motion.div>
 );
 
+const ColorFlipCard: React.FC<{ color: any, unfitInfo: any }> = ({ color, unfitInfo }) => {
+  const [isFlipped, setIsFlipped] = useState(false);
+
+  return (
+    <motion.div 
+      variants={itemVariants}
+      className="relative w-full aspect-[3/4] cursor-pointer perspective-1000"
+      onClick={() => setIsFlipped(!isFlipped)}
+    >
+      <motion.div
+        className="w-full h-full relative preserve-3d transition-transform duration-500"
+        animate={{ rotateY: isFlipped ? 180 : 0 }}
+      >
+        {/* Front */}
+        <div 
+          className={`absolute inset-0 backface-hidden bg-white/60 backdrop-blur-md rounded-2xl p-4 border shadow-sm flex flex-col items-center justify-center gap-4 transition-all ${
+            unfitInfo ? 'border-red-200 shadow-red-100/50' : 'border-white/50'
+          }`}
+        >
+          <div 
+            className="w-20 h-20 rounded-full shadow-inner border border-black/5 flex-shrink-0"
+            style={{ backgroundColor: color.hex }}
+          />
+          <div className="text-center">
+            <div className="font-medium text-gray-900 capitalize text-sm">{color.name}</div>
+            <div className="text-xs font-mono text-gray-500 mt-1">{color.hex}</div>
+          </div>
+          {unfitInfo && <AlertTriangle size={18} className="text-red-500 absolute top-4 right-4" />}
+          <div className="absolute bottom-4 text-[10px] text-gray-400 uppercase tracking-wider">Click to flip</div>
+        </div>
+
+        {/* Back */}
+        <div 
+          className="absolute inset-0 backface-hidden bg-white/90 backdrop-blur-xl rounded-2xl p-5 border border-white/50 shadow-md flex flex-col overflow-y-auto"
+          style={{ transform: 'rotateY(180deg)' }}
+        >
+          <div className="flex items-center gap-2 mb-3 pb-2 border-b border-gray-100">
+            <div className="w-4 h-4 rounded-full" style={{ backgroundColor: color.hex }} />
+            <span className="font-medium text-gray-900 text-sm truncate">{color.name}</span>
+          </div>
+          
+          {unfitInfo && (
+            <div className="bg-red-50/80 rounded-lg p-2 text-xs text-red-700 border border-red-100 mb-3">
+              <span className="font-semibold">Issue:</span> {unfitInfo.reason}
+            </div>
+          )}
+
+          <div className="flex-1">
+            <div className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Mixing Guide</div>
+            <p className="text-sm text-gray-700 leading-relaxed whitespace-pre-wrap">
+              {color.mixingGuide}
+            </p>
+          </div>
+        </div>
+      </motion.div>
+    </motion.div>
+  );
+};
+
 export default function App() {
   const [imageSrc, setImageSrc] = useState<string | null>(null);
   const [isDragging, setIsDragging] = useState(false);
@@ -120,6 +179,11 @@ export default function App() {
   const [mimeType, setMimeType] = useState<string | null>(null);
   const [finalReviewText, setFinalReviewText] = useState<string | null>(null);
   const [showPaletteCard, setShowPaletteCard] = useState(false);
+  
+  // Sketch mode states
+  const [isSketch, setIsSketch] = useState(false);
+  const [selectedStyle, setSelectedStyle] = useState('Nhẹ nhàng (Pastel)');
+  const [paintType, setPaintType] = useState('Poster Color');
   
   const fileInputRef = useRef<HTMLInputElement>(null);
   const abortControllerRef = useRef<AbortController | null>(null);
@@ -186,10 +250,21 @@ export default function App() {
           setBase64Image(base64Data);
           setMimeType(compressedFile.type);
           
-          const analysis = await analyzeArt(base64Data, compressedFile.type, signal);
+          const analysis = await analyzeArt(base64Data, compressedFile.type, isSketch, selectedStyle, paintType, signal);
           setAnalysisResult(analysis);
-          if (analysis.suggestions.final_palette.length > 0) {
+          
+          if (isSketch && analysis.determined_mood) {
+            setChatHistory([{
+              role: 'model',
+              text: `Chào Tuấn! Bức phác thảo này của bạn gợi cảm giác ${analysis.determined_mood}. Belle đã chọn một bảng màu phong cách ${analysis.suggested_style} để tôn lên nét vẽ của bạn. Bạn thấy sao?`
+            }]);
+          }
+
+          if (analysis.suggestions?.final_palette?.length > 0) {
             setSelectedColor(analysis.suggestions.final_palette[0]);
+          } else if (analysis.current_colors?.length > 0) {
+            // For sketch mode, current_colors holds the proposed palette
+            setSelectedColor(analysis.current_colors[0] as any);
           }
         } catch (err: any) {
           if (err.name === 'AbortError') {
@@ -253,7 +328,7 @@ export default function App() {
   };
 
   const handleSendMessage = async (text: string, isFinalReview = false) => {
-    if (!text.trim() || !base64Image || !mimeType || !analysisResult) return;
+    if ((!text.trim() && !isFinalReview) || !base64Image || !mimeType || !analysisResult) return;
     
     const userMessage = isFinalReview ? "Tôi đã hoàn thành bức tranh này. Hãy cho tôi nhận xét cuối cùng nhé." : text.trim();
     setChatInput("");
@@ -318,26 +393,69 @@ export default function App() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, scale: 0.95 }}
-                className={`w-full max-w-2xl aspect-[4/3] md:aspect-[16/9] rounded-3xl border-2 border-dashed transition-all duration-300 flex flex-col items-center justify-center cursor-pointer ${
-                  isDragging ? 'border-blue-500 bg-blue-50/50' : 'border-gray-300 hover:border-gray-400 bg-white/50'
-                }`}
-                onDragOver={handleDragOver}
-                onDragLeave={handleDragLeave}
-                onDrop={handleDrop}
-                onClick={() => fileInputRef.current?.click()}
+                className="w-full max-w-2xl flex flex-col items-center"
               >
-                <input
-                  type="file"
-                  ref={fileInputRef}
-                  onChange={handleFileChange}
-                  accept="image/*"
-                  className="hidden"
-                />
-                <div className="w-20 h-20 rounded-full bg-gray-100 flex items-center justify-center mb-6 text-gray-400">
-                  <UploadCloud size={32} />
+                <div className="w-full bg-white/60 backdrop-blur-md rounded-2xl p-6 mb-6 shadow-sm border border-white/50 flex flex-col md:flex-row gap-4 items-center justify-between">
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input 
+                      type="checkbox" 
+                      checked={isSketch}
+                      onChange={(e) => setIsSketch(e.target.checked)}
+                      className="w-5 h-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                    />
+                    <span className="font-medium text-gray-700">Đây là tranh phác thảo (chưa tô màu)</span>
+                  </label>
+                  
+                  {isSketch && (
+                    <div className="flex gap-3 w-full md:w-auto">
+                      <select 
+                        value={selectedStyle}
+                        onChange={(e) => setSelectedStyle(e.target.value)}
+                        className="bg-white border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 flex-1 md:w-32"
+                      >
+                        <option value="Nhẹ nhàng (Pastel)">Pastel</option>
+                        <option value="Vui tươi (Vibrant)">Vui tươi</option>
+                        <option value="U buồn (Melancholy)">U buồn</option>
+                        <option value="Cổ điển (Vintage)">Cổ điển</option>
+                        <option value="Hiện đại (Modern)">Hiện đại</option>
+                      </select>
+                      <select 
+                        value={paintType}
+                        onChange={(e) => setPaintType(e.target.value)}
+                        className="bg-white border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 flex-1 md:w-32"
+                      >
+                        <option value="Poster Color">Poster Color</option>
+                        <option value="Watercolor">Watercolor</option>
+                        <option value="Acrylic">Acrylic</option>
+                        <option value="Oil Paint">Oil Paint</option>
+                        <option value="Digital Art">Digital Art</option>
+                      </select>
+                    </div>
+                  )}
                 </div>
-                <h3 className="text-xl font-medium text-gray-800 mb-2">Drag & drop your painting</h3>
-                <p className="text-gray-500 text-sm">or click to browse files</p>
+
+                <div
+                  className={`w-full aspect-[4/3] md:aspect-[16/9] rounded-3xl border-2 border-dashed transition-all duration-300 flex flex-col items-center justify-center cursor-pointer ${
+                    isDragging ? 'border-blue-500 bg-blue-50/50' : 'border-gray-300 hover:border-gray-400 bg-white/50'
+                  }`}
+                  onDragOver={handleDragOver}
+                  onDragLeave={handleDragLeave}
+                  onDrop={handleDrop}
+                  onClick={() => fileInputRef.current?.click()}
+                >
+                  <input
+                    type="file"
+                    ref={fileInputRef}
+                    onChange={handleFileChange}
+                    accept="image/*"
+                    className="hidden"
+                  />
+                  <div className="w-20 h-20 rounded-full bg-gray-100 flex items-center justify-center mb-6 text-gray-400">
+                    <UploadCloud size={32} />
+                  </div>
+                  <h3 className="text-xl font-medium text-gray-800 mb-2">Drag & drop your painting</h3>
+                  <p className="text-gray-500 text-sm">or click to browse files</p>
+                </div>
               </motion.div>
             ) : (
               <motion.div
@@ -425,19 +543,21 @@ export default function App() {
                           : 'text-gray-500 hover:text-gray-700'
                       }`}
                     >
-                      Current
+                      {isSketch ? 'Proposed' : 'Current'}
                     </button>
-                    <button
-                      onClick={() => setActiveTab('optimized')}
-                      className={`flex-1 py-2 px-2 rounded-lg text-sm font-medium transition-all flex items-center justify-center gap-1 ${
-                        activeTab === 'optimized' 
-                          ? 'bg-white shadow-sm text-blue-600' 
-                          : 'text-gray-500 hover:text-gray-700'
-                      }`}
-                    >
-                      <Wand2 size={14} />
-                      Optimized
-                    </button>
+                    {!isSketch && (
+                      <button
+                        onClick={() => setActiveTab('optimized')}
+                        className={`flex-1 py-2 px-2 rounded-lg text-sm font-medium transition-all flex items-center justify-center gap-1 ${
+                          activeTab === 'optimized' 
+                            ? 'bg-white shadow-sm text-blue-600' 
+                            : 'text-gray-500 hover:text-gray-700'
+                        }`}
+                      >
+                        <Wand2 size={14} />
+                        Optimized
+                      </button>
+                    )}
                     <button
                       onClick={() => setActiveTab('belle')}
                       className={`flex-1 py-2 px-2 rounded-lg text-sm font-medium transition-all flex items-center justify-center gap-1 ${
@@ -465,7 +585,7 @@ export default function App() {
                         <section>
                           <h3 className="text-sm font-bold tracking-wider text-gray-500 uppercase mb-4 flex items-center gap-2">
                             <Droplet size={16} />
-                            Predicted Medium
+                            {isSketch ? 'Selected Medium' : 'Predicted Medium'}
                           </h3>
                           <div className="bg-white/60 backdrop-blur-md rounded-2xl p-6 border border-white/50 shadow-sm">
                             <div className="text-xl font-medium text-gray-900 mb-2">
@@ -477,49 +597,31 @@ export default function App() {
                           </div>
                         </section>
 
+                        {isSketch && analysisResult.placement_guide && (
+                          <section>
+                            <h3 className="text-sm font-bold tracking-wider text-gray-500 uppercase mb-4 flex items-center gap-2">
+                              <Info size={16} />
+                              Placement Guide
+                            </h3>
+                            <div className="bg-white/60 backdrop-blur-md rounded-2xl p-6 border border-white/50 shadow-sm">
+                              <p className="text-gray-700 leading-relaxed text-sm whitespace-pre-wrap">
+                                {analysisResult.placement_guide}
+                              </p>
+                            </div>
+                          </section>
+                        )}
+
                         <section>
                           <h3 className="text-sm font-bold tracking-wider text-gray-500 uppercase mb-4 flex items-center gap-2">
                             <Palette size={16} />
-                            Current Palette
+                            {isSketch ? 'Proposed Palette' : 'Current Palette'}
                           </h3>
-                          <motion.div variants={containerVariants} initial="hidden" animate="show" className="space-y-4">
+                          <motion.div variants={containerVariants} initial="hidden" animate="show" className="grid grid-cols-2 gap-4">
                             {analysisResult.current_colors.map((color, index) => {
-                              const unfitInfo = analysisResult.issue.unfit_colors.find(u => u.hex.toLowerCase() === color.hex.toLowerCase());
+                              const unfitInfo = analysisResult.issue?.unfit_colors?.find(u => u.hex.toLowerCase() === color.hex.toLowerCase());
                               
                               return (
-                                <motion.div 
-                                  variants={itemVariants}
-                                  key={index} 
-                                  className={`bg-white/60 backdrop-blur-md rounded-2xl p-4 border shadow-sm flex flex-col gap-4 transition-all ${
-                                    unfitInfo ? 'border-red-200 shadow-red-100/50' : 'border-white/50'
-                                  }`}
-                                >
-                                  <div className="flex items-center gap-4">
-                                    <div 
-                                      className="w-16 h-16 rounded-xl shadow-inner border border-black/5 flex-shrink-0"
-                                      style={{ backgroundColor: color.hex }}
-                                    />
-                                    <div className="flex-1">
-                                      <div className="flex items-center justify-between">
-                                        <div className="font-medium text-gray-900 capitalize">{color.name}</div>
-                                        {unfitInfo && <AlertTriangle size={18} className="text-red-500" />}
-                                      </div>
-                                      <div className="text-xs font-mono text-gray-500 mt-1">{color.hex}</div>
-                                    </div>
-                                  </div>
-                                  
-                                  {unfitInfo && (
-                                    <div className="bg-red-50/80 rounded-xl p-3 text-sm text-red-700 border border-red-100 flex items-start gap-2">
-                                      <Info size={16} className="mt-0.5 flex-shrink-0" />
-                                      <span>{unfitInfo.reason}</span>
-                                    </div>
-                                  )}
-
-                                  <div className="bg-white/50 rounded-xl p-3 text-sm text-gray-700 border border-white/60">
-                                    <span className="font-medium text-gray-900 mr-2">Mix:</span>
-                                    {color.mixingGuide}
-                                  </div>
-                                </motion.div>
+                                <ColorFlipCard key={index} color={color} unfitInfo={unfitInfo} />
                               );
                             })}
                           </motion.div>
@@ -527,7 +629,7 @@ export default function App() {
                       </motion.div>
                       )}
 
-                      {activeTab === 'optimized' && (
+                      {!isSketch && activeTab === 'optimized' && (
                         <motion.div
                           key="optimized"
                           initial={{ opacity: 0, x: 20 }}
@@ -543,12 +645,12 @@ export default function App() {
                           </h3>
                           <div className="bg-white/60 backdrop-blur-md rounded-2xl p-6 border border-white/50 shadow-sm">
                             <p className="text-gray-700 leading-relaxed text-sm">
-                              {analysisResult.issue.critique}
+                              {analysisResult.issue?.critique}
                             </p>
                             
                             <div className="mt-4 space-y-3">
                               <div className="text-xs font-bold tracking-wider text-gray-400 uppercase">Suggested Replacements</div>
-                              {analysisResult.suggestions.replacement_colors.map((color, index) => (
+                              {analysisResult.suggestions?.replacement_colors?.map((color, index) => (
                                 <div key={index} className="flex items-start gap-3">
                                   <div 
                                     className="w-8 h-8 rounded-full shadow-inner border border-black/5 flex-shrink-0 mt-1"
