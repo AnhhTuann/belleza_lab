@@ -1,9 +1,9 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { UploadCloud, Image as ImageIcon, Palette, Droplet, RefreshCw, Sparkles, AlertTriangle, Wand2, CheckCircle, Info } from 'lucide-react';
+import { UploadCloud, Image as ImageIcon, Palette, Droplet, RefreshCw, Sparkles, AlertTriangle, Wand2, CheckCircle, Info, MessageCircle, Send } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import imageCompression from 'browser-image-compression';
 import chroma from 'chroma-js';
-import { analyzeArt, ArtAnalysisResult, FinalPaletteColor } from './services/geminiService';
+import { analyzeArt, ArtAnalysisResult, FinalPaletteColor, chatWithBelle, ChatMessage } from './services/geminiService';
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -46,11 +46,18 @@ export default function App() {
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [analysisResult, setAnalysisResult] = useState<ArtAnalysisResult | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState<'current' | 'optimized'>('current');
+  const [activeTab, setActiveTab] = useState<'current' | 'optimized' | 'belle'>('current');
   const [selectedColor, setSelectedColor] = useState<FinalPaletteColor | null>(null);
+  
+  const [chatHistory, setChatHistory] = useState<ChatMessage[]>([]);
+  const [chatInput, setChatInput] = useState("");
+  const [isChatting, setIsChatting] = useState(false);
+  const [base64Image, setBase64Image] = useState<string | null>(null);
+  const [mimeType, setMimeType] = useState<string | null>(null);
   
   const fileInputRef = useRef<HTMLInputElement>(null);
   const abortControllerRef = useRef<AbortController | null>(null);
+  const chatEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     return () => {
@@ -59,6 +66,12 @@ export default function App() {
       }
     };
   }, []);
+
+  useEffect(() => {
+    if (activeTab === 'belle' && chatEndRef.current) {
+      chatEndRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, [chatHistory, isChatting, activeTab]);
 
   const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault();
@@ -87,6 +100,7 @@ export default function App() {
     setAnalysisResult(null);
     setActiveTab('current');
     setSelectedColor(null);
+    setChatHistory([]);
 
     try {
       const options = {
@@ -103,6 +117,9 @@ export default function App() {
         
         try {
           const base64Data = result.split(',')[1];
+          setBase64Image(base64Data);
+          setMimeType(compressedFile.type);
+          
           const analysis = await analyzeArt(base64Data, compressedFile.type, signal);
           setAnalysisResult(analysis);
           if (analysis.suggestions.final_palette.length > 0) {
@@ -148,11 +165,14 @@ export default function App() {
       abortControllerRef.current.abort();
     }
     setImageSrc(null);
+    setBase64Image(null);
+    setMimeType(null);
     setAnalysisResult(null);
     setError(null);
     setIsAnalyzing(false);
     setActiveTab('current');
     setSelectedColor(null);
+    setChatHistory([]);
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
     }
@@ -163,6 +183,31 @@ export default function App() {
       return chroma.contrast(hex, 'white') > 4.5 ? 'text-white' : 'text-gray-900';
     } catch {
       return 'text-gray-900';
+    }
+  };
+
+  const handleSendMessage = async (text: string) => {
+    if (!text.trim() || !base64Image || !mimeType || !analysisResult) return;
+    
+    const userMessage = text.trim();
+    setChatInput("");
+    setChatHistory(prev => [...prev, { role: 'user', text: userMessage }]);
+    setIsChatting(true);
+
+    try {
+      const responseText = await chatWithBelle(
+        userMessage,
+        chatHistory,
+        base64Image,
+        mimeType,
+        analysisResult
+      );
+      setChatHistory(prev => [...prev, { role: 'model', text: responseText }]);
+    } catch (err) {
+      console.error("Chat error:", err);
+      setChatHistory(prev => [...prev, { role: 'model', text: "Xin lỗi Tuấn, Belle đang gặp chút sự cố kết nối. Bạn thử lại sau nhé!" }]);
+    } finally {
+      setIsChatting(false);
     }
   };
 
@@ -272,7 +317,7 @@ export default function App() {
             transition={{ type: 'spring', damping: 25, stiffness: 200 }}
             className="w-full md:w-[400px] lg:w-[480px] h-screen overflow-y-auto sidebar-glass z-20 flex-shrink-0 flex flex-col"
           >
-            <div className="p-8 flex-1">
+            <div className="p-8 flex-1 flex flex-col">
               <h2 className="text-2xl font-serif font-semibold mb-6 flex items-center gap-3">
                 <ImageIcon className="text-blue-500" />
                 Analysis Results
@@ -294,13 +339,13 @@ export default function App() {
                   </div>
                 </div>
               ) : analysisResult ? (
-                <div className="space-y-8">
+                <div className="flex-1 flex flex-col">
                   
                   {/* Tabs */}
-                  <div className="flex p-1 bg-white/40 backdrop-blur-md rounded-xl border border-white/50">
+                  <div className="flex p-1 bg-white/40 backdrop-blur-md rounded-xl border border-white/50 mb-8 flex-shrink-0">
                     <button
                       onClick={() => setActiveTab('current')}
-                      className={`flex-1 py-2 px-4 rounded-lg text-sm font-medium transition-all ${
+                      className={`flex-1 py-2 px-2 rounded-lg text-sm font-medium transition-all ${
                         activeTab === 'current' 
                           ? 'bg-white shadow-sm text-gray-900' 
                           : 'text-gray-500 hover:text-gray-700'
@@ -310,27 +355,39 @@ export default function App() {
                     </button>
                     <button
                       onClick={() => setActiveTab('optimized')}
-                      className={`flex-1 py-2 px-4 rounded-lg text-sm font-medium transition-all flex items-center justify-center gap-2 ${
+                      className={`flex-1 py-2 px-2 rounded-lg text-sm font-medium transition-all flex items-center justify-center gap-1 ${
                         activeTab === 'optimized' 
                           ? 'bg-white shadow-sm text-blue-600' 
                           : 'text-gray-500 hover:text-gray-700'
                       }`}
                     >
-                      <Wand2 size={16} />
+                      <Wand2 size={14} />
                       Optimized
+                    </button>
+                    <button
+                      onClick={() => setActiveTab('belle')}
+                      className={`flex-1 py-2 px-2 rounded-lg text-sm font-medium transition-all flex items-center justify-center gap-1 ${
+                        activeTab === 'belle' 
+                          ? 'bg-white shadow-sm text-yellow-600' 
+                          : 'text-gray-500 hover:text-gray-700'
+                      }`}
+                    >
+                      <MessageCircle size={14} />
+                      Ask Belle
                     </button>
                   </div>
 
-                  <AnimatePresence mode="wait">
-                    {activeTab === 'current' ? (
-                      <motion.div
-                        key="current"
-                        initial={{ opacity: 0, x: -20 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        exit={{ opacity: 0, x: -20 }}
-                        transition={{ duration: 0.2 }}
-                        className="space-y-8"
-                      >
+                  <div className="flex-1 relative">
+                    <AnimatePresence mode="wait">
+                      {activeTab === 'current' && (
+                        <motion.div
+                          key="current"
+                          initial={{ opacity: 0, x: -20 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          exit={{ opacity: 0, x: -20 }}
+                          transition={{ duration: 0.2 }}
+                          className="space-y-8 absolute inset-0 overflow-y-auto pb-8"
+                        >
                         <section>
                           <h3 className="text-sm font-bold tracking-wider text-gray-500 uppercase mb-4 flex items-center gap-2">
                             <Droplet size={16} />
@@ -394,15 +451,17 @@ export default function App() {
                           </motion.div>
                         </section>
                       </motion.div>
-                    ) : (
-                      <motion.div
-                        key="optimized"
-                        initial={{ opacity: 0, x: 20 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        exit={{ opacity: 0, x: 20 }}
-                        transition={{ duration: 0.2 }}
-                        className="space-y-8"
-                      >
+                      )}
+
+                      {activeTab === 'optimized' && (
+                        <motion.div
+                          key="optimized"
+                          initial={{ opacity: 0, x: 20 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          exit={{ opacity: 0, x: 20 }}
+                          transition={{ duration: 0.2 }}
+                          className="space-y-8 absolute inset-0 overflow-y-auto pb-8"
+                        >
                         <section>
                           <h3 className="text-sm font-bold tracking-wider text-gray-500 uppercase mb-4 flex items-center gap-2">
                             <Sparkles size={16} />
@@ -493,9 +552,98 @@ export default function App() {
                         </section>
                       </motion.div>
                     )}
+
+                    {activeTab === 'belle' && (
+                      <motion.div
+                        key="belle"
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: 20 }}
+                        transition={{ duration: 0.2 }}
+                        className="absolute inset-0 flex flex-col bg-white/40 backdrop-blur-md rounded-2xl border border-white/50 overflow-hidden"
+                      >
+                        <div className="p-4 border-b border-white/50 flex items-center gap-3 bg-white/50 flex-shrink-0">
+                          <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-yellow-400 to-orange-300 flex items-center justify-center text-white font-serif text-lg shadow-sm">B</div>
+                          <div>
+                            <h3 className="font-serif text-base font-medium text-gray-900">Belle</h3>
+                            <p className="text-xs text-gray-500">Art Muse & Consultant</p>
+                          </div>
+                        </div>
+
+                        <div className="flex-1 overflow-y-auto p-4 space-y-4">
+                          <motion.div 
+                            initial={{ opacity: 0, x: -10 }} 
+                            animate={{ opacity: 1, x: 0 }}
+                            className="bg-white/80 p-3 rounded-2xl rounded-tl-sm max-w-[85%] shadow-sm border border-white"
+                          >
+                            <p className="text-sm text-gray-800 leading-relaxed">
+                              Chào Tuấn! Mình là Belle, nàng thơ ảo của Belleza Lab. Mình đã xem qua bức tranh và bảng màu. Bạn muốn mình tư vấn thêm về điều gì không?
+                            </p>
+                          </motion.div>
+                          
+                          {chatHistory.map((msg, idx) => (
+                            <motion.div 
+                              key={idx}
+                              initial={{ opacity: 0, x: msg.role === 'user' ? 10 : -10 }} 
+                              animate={{ opacity: 1, x: 0 }}
+                              className={`p-3 rounded-2xl max-w-[85%] shadow-sm border ${
+                                msg.role === 'user' 
+                                  ? 'bg-blue-500 text-white rounded-tr-sm self-end ml-auto border-blue-600' 
+                                  : 'bg-white/80 text-gray-800 rounded-tl-sm border-white'
+                              }`}
+                            >
+                              <p className="text-sm leading-relaxed whitespace-pre-wrap">
+                                {msg.text}
+                              </p>
+                            </motion.div>
+                          ))}
+                          
+                          {isChatting && (
+                            <motion.div 
+                              initial={{ opacity: 0, x: -10 }} 
+                              animate={{ opacity: 1, x: 0 }}
+                              className="bg-white/80 p-3 rounded-2xl rounded-tl-sm max-w-[85%] shadow-sm border border-white flex gap-1 items-center"
+                            >
+                              <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" />
+                              <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }} />
+                              <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.4s' }} />
+                            </motion.div>
+                          )}
+                          <div ref={chatEndRef} />
+                        </div>
+
+                        <div className="p-4 bg-white/50 border-t border-white/50 space-y-3 flex-shrink-0">
+                          {chatHistory.length === 0 && (
+                            <div className="flex flex-wrap gap-2">
+                              <button onClick={() => handleSendMessage("Bố cục đã ổn chưa?")} className="text-xs bg-white/80 hover:bg-white px-3 py-1.5 rounded-full border border-gray-200 text-gray-700 transition-colors shadow-sm">🎨 Bố cục đã ổn chưa?</button>
+                              <button onClick={() => handleSendMessage("Gợi ý cách vẽ mây.")} className="text-xs bg-white/80 hover:bg-white px-3 py-1.5 rounded-full border border-gray-200 text-gray-700 transition-colors shadow-sm">💡 Gợi ý cách vẽ mây.</button>
+                              <button onClick={() => handleSendMessage("Hợp với không gian nào?")} className="text-xs bg-white/80 hover:bg-white px-3 py-1.5 rounded-full border border-gray-200 text-gray-700 transition-colors shadow-sm">🏠 Hợp với không gian nào?</button>
+                            </div>
+                          )}
+                          <div className="flex gap-2">
+                            <input 
+                              type="text" 
+                              value={chatInput}
+                              onChange={(e) => setChatInput(e.target.value)}
+                              onKeyDown={(e) => e.key === 'Enter' && handleSendMessage(chatInput)}
+                              placeholder="Hỏi Belle về bức tranh..."
+                              className="flex-1 bg-white/80 border border-gray-200 rounded-full px-4 py-2 text-sm focus:outline-none focus:border-blue-400 transition-colors shadow-inner"
+                            />
+                            <button 
+                              onClick={() => handleSendMessage(chatInput)}
+                              disabled={!chatInput.trim() || isChatting}
+                              className="w-10 h-10 rounded-full bg-blue-500 hover:bg-blue-600 text-white flex items-center justify-center transition-colors disabled:opacity-50 shadow-sm flex-shrink-0"
+                            >
+                              <Send size={16} />
+                            </button>
+                          </div>
+                        </div>
+                      </motion.div>
+                    )}
                   </AnimatePresence>
 
                 </div>
+              </div>
               ) : null}
             </div>
           </motion.aside>

@@ -40,6 +40,11 @@ export interface ArtAnalysisResult {
   };
 }
 
+export interface ChatMessage {
+  role: 'user' | 'model';
+  text: string;
+}
+
 export async function analyzeArt(base64Image: string, mimeType: string, signal?: AbortSignal): Promise<ArtAnalysisResult> {
   const responsePromise = ai.models.generateContent({
     model: "gemini-3-flash-preview",
@@ -167,4 +172,61 @@ Output Format: Strict JSON matching the schema. Do not include markdown formatti
   const response = await responsePromise;
   const jsonStr = response.text?.trim() || "{}";
   return JSON.parse(jsonStr) as ArtAnalysisResult;
+}
+
+export async function chatWithBelle(
+  message: string,
+  history: ChatMessage[],
+  base64Image: string,
+  mimeType: string,
+  analysisResult: ArtAnalysisResult
+): Promise<string> {
+  const systemInstruction = `Identity: Your name is Belle, the virtual muse of Belleza Lab.
+Personality: Sophisticated, encouraging, poetic yet technically skilled in painting (especially Poster colors and Digital art).
+Tone of Voice: Friendly (calling the user "Tuấn"), inspiring, and professional.
+Knowledge: You have access to the image analysis (colors, medium, harmony). When asked "Is this okay?", evaluate based on composition, color balance, and emotional impact.
+Always respond in Vietnamese. Keep responses concise and helpful.`;
+
+  const contents = [
+    {
+      role: "user",
+      parts: [
+        {
+          inlineData: {
+            data: base64Image,
+            mimeType: mimeType,
+          },
+        },
+        {
+          text: `Here is the analysis of the image: ${JSON.stringify(analysisResult)}`,
+        },
+      ],
+    },
+    {
+      role: "model",
+      parts: [
+        {
+          text: "Chào Tuấn! Mình là Belle, nàng thơ ảo của Belleza Lab. Mình đã xem qua bức tranh và bảng màu. Bạn muốn mình tư vấn thêm về điều gì không?",
+        },
+      ],
+    },
+    ...history.map((msg) => ({
+      role: msg.role,
+      parts: [{ text: msg.text }],
+    })),
+    {
+      role: "user",
+      parts: [{ text: message }],
+    },
+  ];
+
+  const response = await ai.models.generateContent({
+    model: "gemini-3-flash-preview",
+    contents: contents as any,
+    config: {
+      systemInstruction: systemInstruction,
+    },
+  });
+
+  return response.text || "";
 }
