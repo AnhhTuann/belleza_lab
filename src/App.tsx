@@ -1,8 +1,9 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { UploadCloud, Image as ImageIcon, Palette, Droplet, RefreshCw, Sparkles, AlertTriangle, Wand2, CheckCircle, Info, MessageCircle, Send } from 'lucide-react';
+import { UploadCloud, Image as ImageIcon, Palette, Droplet, RefreshCw, Sparkles, AlertTriangle, Wand2, CheckCircle, Info, MessageCircle, Send, Award, Download } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import imageCompression from 'browser-image-compression';
 import chroma from 'chroma-js';
+import html2canvas from 'html2canvas';
 import { analyzeArt, ArtAnalysisResult, FinalPaletteColor, chatWithBelle, ChatMessage } from './services/geminiService';
 
 const containerVariants = {
@@ -54,10 +55,13 @@ export default function App() {
   const [isChatting, setIsChatting] = useState(false);
   const [base64Image, setBase64Image] = useState<string | null>(null);
   const [mimeType, setMimeType] = useState<string | null>(null);
+  const [finalReviewText, setFinalReviewText] = useState<string | null>(null);
+  const [isGeneratingCert, setIsGeneratingCert] = useState(false);
   
   const fileInputRef = useRef<HTMLInputElement>(null);
   const abortControllerRef = useRef<AbortController | null>(null);
   const chatEndRef = useRef<HTMLDivElement>(null);
+  const certificateRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     return () => {
@@ -186,28 +190,55 @@ export default function App() {
     }
   };
 
-  const handleSendMessage = async (text: string) => {
+  const handleSendMessage = async (text: string, isFinalReview = false) => {
     if (!text.trim() || !base64Image || !mimeType || !analysisResult) return;
     
-    const userMessage = text.trim();
+    const userMessage = isFinalReview ? "Tôi đã hoàn thành bức tranh này. Hãy cho tôi nhận xét cuối cùng nhé." : text.trim();
     setChatInput("");
     setChatHistory(prev => [...prev, { role: 'user', text: userMessage }]);
     setIsChatting(true);
 
     try {
+      const promptToSend = isFinalReview 
+        ? "Bức tranh này đã hoàn thành. Với tư cách là Belle từ Belleza Lab, hãy đưa ra một lời nhận xét chuyên sâu, đầy cảm hứng và tinh tế về tác phẩm này. Tập trung vào sự hài hòa cuối cùng và cảm xúc mà nó mang lại. Cấu trúc nhận xét bao gồm: Emotional Impact (Cảm xúc), Technical Skill (Kỹ thuật), Overall Harmony (Sự hài hòa), và Exhibition Suggestion (Gợi ý trưng bày)."
+        : userMessage;
+
       const responseText = await chatWithBelle(
-        userMessage,
+        promptToSend,
         chatHistory,
         base64Image,
         mimeType,
         analysisResult
       );
       setChatHistory(prev => [...prev, { role: 'model', text: responseText }]);
+      if (isFinalReview) {
+        setFinalReviewText(responseText);
+      }
     } catch (err) {
       console.error("Chat error:", err);
       setChatHistory(prev => [...prev, { role: 'model', text: "Xin lỗi Tuấn, Belle đang gặp chút sự cố kết nối. Bạn thử lại sau nhé!" }]);
     } finally {
       setIsChatting(false);
+    }
+  };
+
+  const downloadCertificate = async () => {
+    if (!certificateRef.current) return;
+    setIsGeneratingCert(true);
+    try {
+      const canvas = await html2canvas(certificateRef.current, { 
+        scale: 2, 
+        useCORS: true,
+        backgroundColor: '#ffffff'
+      });
+      const link = document.createElement('a');
+      link.download = 'belleza-lab-certificate.png';
+      link.href = canvas.toDataURL('image/png');
+      link.click();
+    } catch (err) {
+      console.error("Failed to generate certificate", err);
+    } finally {
+      setIsGeneratingCert(false);
     }
   };
 
@@ -620,6 +651,26 @@ export default function App() {
                               <button onClick={() => handleSendMessage("Hợp với không gian nào?")} className="text-xs bg-white/80 hover:bg-white px-3 py-1.5 rounded-full border border-gray-200 text-gray-700 transition-colors shadow-sm">🏠 Hợp với không gian nào?</button>
                             </div>
                           )}
+                          <div className="flex flex-wrap gap-2 mb-2">
+                            <button 
+                              onClick={() => handleSendMessage("", true)}
+                              disabled={isChatting}
+                              className="text-xs bg-gradient-to-r from-yellow-400 to-orange-400 hover:from-yellow-500 hover:to-orange-500 text-white px-4 py-2 rounded-full font-medium transition-colors shadow-sm flex items-center gap-1"
+                            >
+                              <Award size={14} />
+                              Đã hoàn thành (Final Review)
+                            </button>
+                            {finalReviewText && (
+                              <button 
+                                onClick={downloadCertificate}
+                                disabled={isGeneratingCert}
+                                className="text-xs bg-white hover:bg-gray-50 text-gray-800 px-4 py-2 rounded-full font-medium transition-colors shadow-sm border border-gray-200 flex items-center gap-1"
+                              >
+                                {isGeneratingCert ? <RefreshCw size={14} className="animate-spin" /> : <Download size={14} />}
+                                Tải Certificate
+                              </button>
+                            )}
+                          </div>
                           <div className="flex gap-2">
                             <input 
                               type="text" 
@@ -649,6 +700,54 @@ export default function App() {
           </motion.aside>
         )}
       </AnimatePresence>
+
+      {/* Hidden Certificate for Export */}
+      {analysisResult && imageSrc && (
+        <div className="absolute top-[-9999px] left-[-9999px]">
+          <div 
+            ref={certificateRef} 
+            className="w-[800px] bg-white p-10 flex flex-col items-center justify-center font-serif relative overflow-hidden"
+            style={{ backgroundImage: 'linear-gradient(135deg, #fdfbfb 0%, #ebedee 100%)' }}
+          >
+            {/* Decorative elements */}
+            <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-yellow-400 via-orange-300 to-yellow-400" />
+            <div className="absolute bottom-0 left-0 w-full h-2 bg-gradient-to-r from-yellow-400 via-orange-300 to-yellow-400" />
+            
+            <h1 className="text-4xl font-bold text-gray-900 mb-2 tracking-tight">Belleza Lab</h1>
+            <p className="text-lg text-gray-500 italic mb-8">Certificate of Completion</p>
+            
+            <div className="w-full flex gap-8 items-center mb-8">
+              <div className="flex-1">
+                <img src={imageSrc} alt="Artwork" className="w-full h-auto rounded-lg shadow-lg object-cover max-h-[400px]" crossOrigin="anonymous" />
+              </div>
+              <div className="w-1/3 flex flex-col gap-4">
+                <h3 className="text-xl font-semibold text-gray-800 border-b pb-2">Color Palette</h3>
+                <div className="flex flex-col gap-3">
+                  {analysisResult.current_colors.slice(0, 5).map((c, i) => (
+                    <div key={i} className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-full shadow-md border border-gray-200" style={{ backgroundColor: c.hex }} />
+                      <div>
+                        <div className="text-sm font-medium text-gray-800 capitalize">{c.name}</div>
+                        <div className="text-xs text-gray-500 font-mono">{c.hex}</div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+            
+            <div className="w-full bg-white/60 backdrop-blur-sm p-6 rounded-xl border border-gray-200 shadow-sm">
+              <div className="flex items-center gap-3 mb-3">
+                <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-yellow-400 to-orange-300 flex items-center justify-center text-white font-serif text-sm shadow-sm">B</div>
+                <h4 className="font-semibold text-gray-900">Belle's Note</h4>
+              </div>
+              <p className="text-gray-700 italic leading-relaxed whitespace-pre-wrap">
+                {finalReviewText || "Một tác phẩm tuyệt vời thể hiện sự nhạy bén trong việc sử dụng màu sắc và ánh sáng. Sự kết hợp các mảng màu tạo nên một tổng thể hài hòa và đầy cảm xúc."}
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
