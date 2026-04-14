@@ -8,17 +8,15 @@ Chào mừng bạn đến với **Belleza Lab**, một ứng dụng phân tích 
 
 ```text
 ├── src/
-│   ├── components/          # Các thành phần UI tái sử dụng (nếu có)
 │   ├── services/
 │   │   └── geminiService.ts # Logic kết nối với Google Gemini API
-│   ├── App.tsx              # File chính chứa toàn bộ giao diện và logic ứng dụng
+│   ├── App.tsx              # File chính chứa toàn bộ giao diện (MUI) và logic
 │   ├── main.tsx             # Điểm khởi đầu của ứng dụng React
-│   └── index.css            # File cấu hình Tailwind CSS và các hiệu ứng 3D
-├── public/                  # Các tài nguyên tĩnh (hình ảnh, icons)
-├── .env.example             # File mẫu cấu hình biến môi trường
-├── package.json             # Danh sách các thư viện và script chạy dự án
-├── tsconfig.json            # Cấu hình TypeScript
-└── vite.config.ts           # Cấu hình công cụ đóng gói Vite
+│   └── index.css            # Custom animations (Aurora, Shimmer, Particles)
+├── public/                  # Các tài nguyên tĩnh
+├── package.json             # Danh sách dependencies (MUI, Framer Motion, v.v.)
+├── tsconfig.json            # Cấu hình TypeScript cho MUI & React
+└── vite.config.ts           # Cấu hình Vite (loại bỏ Tailwind plugin)
 ```
 
 ---
@@ -27,29 +25,28 @@ Chào mừng bạn đến với **Belleza Lab**, một ứng dụng phân tích 
 
 | Thư viện | Tác dụng |
 | :--- | :--- |
-| `@google/genai` | Thư viện chính để kết nối và gửi yêu cầu đến mô hình Gemini AI. |
-| `react` & `react-dom` | Thư viện nền tảng để xây dựng giao diện người dùng theo component. |
-| `vite` | Công cụ build cực nhanh giúp phát triển và đóng gói ứng dụng. |
-| `tailwindcss` | Framework CSS giúp thiết kế giao diện nhanh chóng bằng các class tiện ích. |
-| `motion` (Framer Motion) | Xử lý các hiệu ứng chuyển động, animation mượt mà và hiệu ứng 3D. |
-| `lucide-react` | Bộ sưu tập các icon vector đẹp mắt và đồng bộ. |
-| `browser-image-compression` | Nén hình ảnh ngay trên trình duyệt trước khi gửi lên AI để tiết kiệm băng thông và tăng tốc độ. |
-| `chroma-js` | Xử lý các phép toán về màu sắc (tính độ tương phản, chuyển đổi hệ màu). |
-| `html-to-image` | Chuyển đổi một vùng HTML (như Thẻ màu) thành hình ảnh PNG để người dùng tải về. |
+| `@google/genai` | Thư viện chính kết nối với mô hình Gemini AI. |
+| `@mui/material` | Framework UI chính (thay thế cho Tailwind CSS). |
+| `@emotion/react` | Engine xử lý style cho Material UI. |
+| `motion` (Framer Motion) | Xử lý các hiệu ứng chuyển động và animation 3D nâng cao. |
+| `lucide-react` | Bộ sưu tập icon vector cao cấp. |
+| `browser-image-compression` | Nén ảnh trước khi gửi AI để tăng tốc độ xử lý. |
+| `chroma-js` | Xử lý các phép toán màu sắc và độ tương phản. |
+| `html-to-image` | Chuyển đổi HTML thành ảnh PNG để tải về. |
 
 ---
 
 ## 3. Chi tiết các File quan trọng
 
 ### 📂 `src/App.tsx` (Trái tim của ứng dụng)
-Đây là file quan trọng nhất, quản lý toàn bộ luồng hoạt động của người dùng:
-- **Quản lý State:** Lưu trữ ảnh đã upload, kết quả phân tích, trạng thái chat, tab hiện tại, v.v.
-- **Xử lý Upload:** Nhận diện file ảnh, nén ảnh và gọi dịch vụ phân tích.
+Đây là file quan trọng nhất, đã được chuyển đổi sang **Material UI**:
+- **ThemeProvider:** Quản lý Dark Theme tùy chỉnh (Gold & Blue accents).
+- **MUI Components:** Sử dụng `Box`, `Paper`, `Stack` thay cho div/flexbox truyền thống.
+- **Glassmorphism:** Các thẻ UI được thiết kế với độ mờ (blur) cao và viền kính siêu mỏng.
 - **Components nội bộ:**
-    - `PaletteCard`: Giao diện thẻ màu nghệ thuật để tải về.
-    - `ColorFlipCard`: Thẻ màu 3D có thể lật để xem công thức pha màu.
-    - `ArtLoader`: Hiệu ứng chờ khi AI đang phân tích.
-- **Giao diện chính:** Chia làm 2 phần (Main View để xem ảnh và Sidebar để xem kết quả/chat).
+    - `PaletteCard`: Thẻ màu phong cách Art Gallery.
+    - `ColorFlipCard`: Thẻ màu 3D sử dụng `motion` để lật xem công thức.
+    - `ArtLoader`: Animation chờ mang phong cách huyền ảo.
 
 ### 📂 `src/services/geminiService.ts` (Bộ não AI)
 File này chịu trách nhiệm giao tiếp với "Belle":
@@ -59,11 +56,12 @@ File này chịu trách nhiệm giao tiếp với "Belle":
 - **`chatWithBelle`:** Xử lý logic trò chuyện liên tục, giữ ngữ cảnh của bức tranh để trả lời các câu hỏi của người dùng.
 - **Prompt Engineering:** Chứa các câu lệnh (prompts) được thiết kế tỉ mỉ để AI trả về dữ liệu đúng cấu trúc JSON.
 
-### 📂 `src/index.css` (Phong cách & Hiệu ứng)
-Ngoài việc nạp Tailwind CSS, file này chứa các class tùy chỉnh cho hiệu ứng 3D:
-- `perspective-1000`: Tạo chiều sâu cho không gian 3D.
-- `preserve-3d`: Giữ cho các phần tử con nằm trong không gian 3D khi xoay.
-- `backface-hidden`: Ẩn mặt sau của thẻ khi nó đang quay mặt trước về phía người dùng.
+### 📂 `src/index.css` (Animations & Redesign)
+Không còn sử dụng Tailwind CSS, file này hiện tập trung vào các animations nghệ thuật:
+- **Aurora Background:** Hiệu ứng các "quang cầu" màu sắc trôi lơ lửng ở nền.
+- **Logo Shimmer:** Hiệu ứng ánh kim chạy dọc chữ "Belleza Lab".
+- **Particles:** Các hạt sáng trôi nổi trong khu vực upload.
+- **Shimmer Sweep:** Hiệu ứng loading cho các phần tử skeleton.
 
 ---
 
