@@ -1,34 +1,293 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,600;1,400&display=swap');
-@import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@200;300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600&display=swap');
 
-@theme {
-  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
-  --font-serif: "Playfair Display", ui-serif, Georgia, serif;
+/* ============================================================
+   CSS CUSTOM PROPERTIES - BELLEZA LAB DARK THEME
+   ============================================================ */
+:root {
+  --bg-void: #04040a;
+  --bg-dark: #0a0a0f;
+  --bg-card: rgba(14, 14, 22, 0.75);
+  --accent-gold: #f59e0b;
+  --accent-gold-glow: rgba(245, 158, 11, 0.25);
+  --accent-blue: #3b82f6;
+  --accent-blue-glow: rgba(59, 130, 246, 0.2);
+  --text-primary: #f0f0f5;
+  --text-secondary: #7a7a8c;
+  --border-glass: rgba(255, 255, 255, 0.07);
+}
+
+/* ============================================================
+   GLOBAL RESET & BASE
+   ============================================================ */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+html, body, #root {
+  height: 100%;
+  margin: 0;
+  padding: 0;
 }
 
 body {
-  background-color: #f8f9fa;
-  color: #1a1a1a;
-  font-family: var(--font-sans);
+  background-color: var(--bg-void);
+  color: var(--text-primary);
+  font-family: 'Outfit', 'Inter', system-ui, sans-serif;
+  overflow: hidden;
 }
 
-.sidebar-glass {
-  background: rgba(255, 255, 255, 0.3);
+/* ============================================================
+   CUSTOM SCROLLBAR
+   ============================================================ */
+::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(245, 158, 11, 0.3);
+  border-radius: 10px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(245, 158, 11, 0.5);
+}
+
+/* ============================================================
+   AURORA BACKGROUND ANIMATION
+   ============================================================ */
+.aurora-bg {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.aurora-orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+  opacity: 0.12;
+  animation: aurora-drift 20s ease-in-out infinite;
+}
+
+.aurora-orb-1 {
+  width: 60vw;
+  height: 60vw;
+  background: radial-gradient(circle, #3b82f6, transparent 70%);
+  top: -20%;
+  left: -20%;
+  animation-delay: 0s;
+  animation-duration: 25s;
+}
+
+.aurora-orb-2 {
+  width: 50vw;
+  height: 50vw;
+  background: radial-gradient(circle, #f59e0b, transparent 70%);
+  bottom: -15%;
+  right: -10%;
+  animation-delay: -8s;
+  animation-duration: 20s;
+}
+
+.aurora-orb-3 {
+  width: 35vw;
+  height: 35vw;
+  background: radial-gradient(circle, #8b5cf6, transparent 70%);
+  top: 40%;
+  left: 40%;
+  animation-delay: -15s;
+  animation-duration: 30s;
+}
+
+.aurora-orb-4 {
+  width: 25vw;
+  height: 25vw;
+  background: radial-gradient(circle, #ec4899, transparent 70%);
+  top: 20%;
+  right: 25%;
+  animation-delay: -5s;
+  animation-duration: 18s;
+}
+
+@keyframes aurora-drift {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  25% { transform: translate(4%, 6%) scale(1.05); }
+  50% { transform: translate(8%, -4%) scale(0.95); }
+  75% { transform: translate(-5%, 3%) scale(1.08); }
+}
+
+/* ============================================================
+   GLASSMORPHISM CARDS
+   ============================================================ */
+.glass-card {
+  background: var(--bg-card);
   backdrop-filter: blur(24px);
   -webkit-backdrop-filter: blur(24px);
-  border-left: 1px solid rgba(255, 255, 255, 0.2);
-  box-shadow: -10px 0 40px rgba(0, 0, 0, 0.1);
+  border: 1px solid var(--border-glass);
 }
 
-/* 3D Flip Utilities */
-.perspective-1000 {
-  perspective: 1000px;
+.glass-sidebar {
+  background: rgba(6, 6, 12, 0.85);
+  backdrop-filter: blur(40px);
+  -webkit-backdrop-filter: blur(40px);
+  border-left: 1px solid var(--border-glass);
 }
 
-.preserve-3d {
-  transform-style: preserve-3d;
+/* ============================================================
+   GOLDEN GLOW EFFECTS
+   ============================================================ */
+.glow-gold {
+  box-shadow: 0 0 20px var(--accent-gold-glow), 0 0 40px rgba(245, 158, 11, 0.1);
 }
 
-.backface-hidden {
-  backface-visibility: hidden;
+.glow-blue {
+  box-shadow: 0 0 20px var(--accent-blue-glow);
+}
+
+.text-gradient-gold {
+  background: linear-gradient(135deg, #f59e0b, #fbbf24, #f97316);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ============================================================
+   UPLOAD ZONE PARTICLES
+   ============================================================ */
+.upload-particle {
+  position: absolute;
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: var(--accent-gold);
+  opacity: 0;
+  animation: particle-float 4s ease-in-out infinite;
+}
+
+@keyframes particle-float {
+  0% { opacity: 0; transform: translateY(20px) scale(0); }
+  20% { opacity: 0.8; }
+  80% { opacity: 0.3; }
+  100% { opacity: 0; transform: translateY(-40px) scale(1.5); }
+}
+
+/* ============================================================
+   SHIMMER SKELETON LOADING
+   ============================================================ */
+.shimmer {
+  background: linear-gradient(
+    90deg,
+    rgba(255,255,255,0.03) 0%,
+    rgba(255,255,255,0.08) 50%,
+    rgba(255,255,255,0.03) 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer-sweep 1.8s ease-in-out infinite;
+  border-radius: 12px;
+}
+
+@keyframes shimmer-sweep {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+/* ============================================================
+   TYPEWRITER ANIMATION (Belle Chat)
+   ============================================================ */
+.typewriter-cursor::after {
+  content: '|';
+  animation: blink-cursor 0.8s step-end infinite;
+  color: var(--accent-gold);
+  font-weight: 300;
+  margin-left: 1px;
+}
+
+@keyframes blink-cursor {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+/* ============================================================
+   COLOR SWATCH MAGNETIC HOVER
+   ============================================================ */
+.color-swatch-magnetic {
+  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+  will-change: transform;
+}
+
+.color-swatch-magnetic:hover {
+  transform: scale(1.12) translateY(-4px);
+}
+
+/* ============================================================
+   BORDER BEACON ANIMATION (Upload Zone Highlight)
+   ============================================================ */
+@keyframes beacon-pulse {
+  0%, 100% { box-shadow: 0 0 0px rgba(245,158,11,0.4); }
+  50% { box-shadow: 0 0 30px rgba(245,158,11,0.6), 0 0 60px rgba(245,158,11,0.2); }
+}
+
+.beacon-pulse {
+  animation: beacon-pulse 2s ease-in-out infinite;
+}
+
+/* ============================================================
+   3D FLIP CARD
+   ============================================================ */
+.perspective-1000 { perspective: 1000px; }
+.preserve-3d { transform-style: preserve-3d; }
+.backface-hidden { backface-visibility: hidden; }
+
+/* ============================================================
+   LOGO SHIMMER
+   ============================================================ */
+@keyframes logo-shimmer {
+  0% { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}
+
+.animated-logo {
+  background: linear-gradient(
+    90deg,
+    #f59e0b 0%,
+    #fbbf24 30%,
+    #fef3c7 50%,
+    #fbbf24 70%,
+    #f59e0b 100%
+  );
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: logo-shimmer 4s linear infinite;
+}
+
+/* ============================================================
+   SCAN LINE EFFECT (Subtle futuristic texture)
+   ============================================================ */
+.scanlines::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0,0,0,0.03) 2px,
+    rgba(0,0,0,0.03) 4px
+  );
+  pointer-events: none;
+  border-radius: inherit;
+}
+
+/* ============================================================
+   STAR DOT GRID (background texture)  
+   ============================================================ */
+.dot-grid {
+  background-image: radial-gradient(rgba(255,255,255,0.04) 1px, transparent 1px);
+  background-size: 32px 32px;
 }
