@@ -65,16 +65,48 @@ Không còn sử dụng Tailwind CSS, file này hiện tập trung vào các ani
 
 ---
 
-## 4. Cách thức hoạt động của các Chức năng chính
+## 4. Chức năng của Belleza Lab
+
+Dưới đây là các tính năng cốt lõi giúp Belleza Lab trở thành người bạn đồng hành lý tưởng cho nghệ sĩ:
+
+### 🎨 Phân tích & Tối ưu Nghệ thuật
+- **Nhận diện Chất liệu:** AI tự động dự đoán loại màu (Sơn dầu, Màu nước, Acrylic...) và đưa ra phân tích về đặc tính kỹ thuật.
+- **Trích xuất Bảng màu:** Tự động lấy các mã màu HEX chính xác đang hiện diện trong tác phẩm.
+- **Phê bình Chuyên sâu:** Belle đưa ra nhận xét về bố cục, sự hài hòa màu sắc và cảm quan nghệ thuật.
+- **Tư vấn Cải thiện:** Chỉ ra các màu sắc chưa phù hợp (Unfit colors) và đề xuất màu thay thế để tăng tính thẩm mỹ.
+
+### 📝 Chế độ Phác thảo (Sketch Mode)
+- **Hỗ trợ từ bước đầu:** Dành cho các bản vẽ nét (line art). AI đề xuất bảng màu 6 màu hoàn chỉnh dựa trên tâm trạng (Mood) và phong cách (Style) bạn chọn.
+- **Hướng dẫn tô màu (Placement Guide):** Cung cấp mô tả chi tiết vị trí nên sử dụng từng màu sắc trên bản vẽ.
+
+### 🤖 Trợ lý ảo Belle (AI Art Muse)
+- **Trò chuyện trực tiếp:** Khung chat cho phép bạn hỏi Belle bất cứ điều gì về hội họa, từ cách pha màu đến ý tưởng sáng tạo.
+- **Ghi nhớ ngữ cảnh:** Belle hiểu sâu sắc về bức tranh bạn đang làm việc để đưa ra lời khuyên cá nhân hóa nhất.
+
+### 🧪 Công thức Pha màu (Mixing Guide)
+- **Thẻ lật 3D:** Click vào từng màu sắc để xem hướng dẫn pha màu chi tiết dựa trên loại màu bạn đang dùng (Màu bột, Màu nước...).
+- **Tính toán tỉ lệ:** Các gợi ý pha màu giúp nghệ sĩ đạt được sắc độ chính xác như AI đề xuất.
+
+### 📥 Xuất thẻ Nghệ thuật (Artist Palette Card)
+- **Lưu giữ kỷ niệm:** Chuyển đổi toàn bộ kết quả phân tích thành một tấm thẻ màu (Palette Card) chuyên nghiệp.
+- **Tải về PNG:** Dễ dàng lưu về máy để chia sẻ lên mạng xã hội hoặc làm tư liệu tham khảo cho các bài vẽ sau.
+
+### 🌗 Trải nghiệm Người dùng Cao cấp
+- **Dual Theme:** Chuyển đổi linh hoạt giữa "The Night Gallery" (Tối) và "The Artist's Canvas" (Sáng).
+- **Thiết kế Glassmorphism:** Giao diện hiện đại với hiệu ứng kính mờ và chuyển động mượt mà.
+
+---
+
+## 5. Cách thức hoạt động của các Luồng chính (System Workflow)
 
 1.  **Phân tích Ảnh (Art Analysis):**
     - Người dùng chọn ảnh -> `App.tsx` nén ảnh -> `geminiService.ts` gửi ảnh + prompt -> Gemini trả về JSON -> `App.tsx` hiển thị bảng màu và nhận xét.
 2.  **Chế độ Phác thảo (Sketch Mode):**
     - Khi bật "Đây là tranh phác thảo", AI sẽ không tìm lỗi màu mà sẽ đóng vai trò là người tư vấn, đề xuất 6 màu phù hợp với tâm trạng của nét vẽ.
-3.  **Thẻ Màu (Palette Card):**
-    - Sau khi nhấn "Final Review", một modal hiện ra. Sử dụng `html-to-image` để chụp lại vùng chứa thông tin và lưu thành file `.png`.
-4.  **Thẻ lật 3D (Flip Cards):**
-    - Mỗi màu trong bảng màu là một `ColorFlipCard`. Khi click, nó sẽ xoay 180 độ để lộ ra công thức pha màu (Mixing Guide) được AI tính toán riêng cho loại màu bạn chọn (Màu nước, Màu bột, v.v.).
+3.  **Lưu Thẻ Màu (Palette Card):**
+    - Sau khi nhấn "Final Review" và nhận lời khen từ Belle, một modal hiện ra. Sử dụng `html-to-image` để kết xuất vùng dữ liệu thành file `.png` chất lượng cao.
+4.  **Tương tác lật 3D (Flip Cards):**
+    - Mỗi màu trong bảng màu là một `ColorFlipCard`. Khi click, nó sẽ xoay 180 độ để lộ ra công thức pha màu chi tiết do AI tính toán.
 
 ---
 *Tài liệu này được tạo ra để giúp bạn dễ dàng quản lý và phát triển dự án Belleza Lab.*

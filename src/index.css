@@ -1,19 +1,87 @@
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@200;300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&display=swap');
 
 /* ============================================================
-   CSS CUSTOM PROPERTIES - BELLEZA LAB DARK THEME
+   CSS CUSTOM PROPERTIES - DUAL THEME SYSTEM
    ============================================================ */
-:root {
-  --bg-void: #04040a;
-  --bg-dark: #0a0a0f;
-  --bg-card: rgba(14, 14, 22, 0.75);
-  --accent-gold: #f59e0b;
-  --accent-gold-glow: rgba(245, 158, 11, 0.25);
-  --accent-blue: #3b82f6;
-  --accent-blue-glow: rgba(59, 130, 246, 0.2);
-  --text-primary: #f0f0f5;
-  --text-secondary: #7a7a8c;
-  --border-glass: rgba(255, 255, 255, 0.07);
+
+/* ─── DARK THEME: "The Night Gallery" (default) ─── */
+:root, [data-theme="dark"] {
+  --bg-primary: #121417;
+  --bg-surface: #1E2126;
+  --bg-surface-alpha: rgba(30, 33, 38, 0.75);
+  --accent: #D4AF37;
+  --accent-hover: #E5C04B;
+  --accent-glow: rgba(212, 175, 55, 0.2);
+  --accent-subtle: rgba(212, 175, 55, 0.08);
+  --text-primary: #F3F4F6;
+  --text-secondary: #9CA3AF;
+  --text-muted: rgba(255, 255, 255, 0.25);
+  --border-glass: rgba(255, 255, 255, 0.10);
+  --border-subtle: rgba(255, 255, 255, 0.05);
+  --glass-bg: rgba(0, 0, 0, 0.30);
+  --glass-border: rgba(255, 255, 255, 0.10);
+  --error-bg: rgba(239, 68, 68, 0.10);
+  --error-border: rgba(239, 68, 68, 0.25);
+  --error-text: #fca5a5;
+  --user-bubble: #2563eb;
+  --user-bubble-shadow: rgba(37, 99, 235, 0.25);
+  --scrollbar-thumb: rgba(212, 175, 55, 0.25);
+  --scrollbar-hover: rgba(212, 175, 55, 0.45);
+  --shimmer-from: rgba(255,255,255,0.02);
+  --shimmer-via: rgba(255,255,255,0.06);
+  --aurora-opacity: 0.10;
+  --dot-opacity: 0.03;
+  --loader-overlay: rgba(18, 20, 23, 0.92);
+  --sidebar-bg: rgba(18, 20, 23, 0.92);
+  --sidebar-shadow: rgba(0, 0, 0, 0.5);
+  --img-preview-bg: #15171a;
+  --select-bg: rgba(255,255,255,0.06);
+  --select-border: rgba(255,255,255,0.10);
+  --chip-bg: rgba(255,255,255,0.06);
+  --chip-border: rgba(255,255,255,0.10);
+  --card-badge-bg: rgba(255,255,255,0.20);
+  --palette-card-bg: #121417;
+  color-scheme: dark;
+}
+
+/* ─── LIGHT THEME: "The Artist's Canvas" ─── */
+[data-theme="light"] {
+  --bg-primary: #FBF9F6;
+  --bg-surface: #FFFFFF;
+  --bg-surface-alpha: rgba(255, 255, 255, 0.80);
+  --accent: #B8860B;
+  --accent-hover: #996F09;
+  --accent-glow: rgba(184, 134, 11, 0.15);
+  --accent-subtle: rgba(184, 134, 11, 0.06);
+  --text-primary: #1F2937;
+  --text-secondary: #6B7280;
+  --text-muted: rgba(0, 0, 0, 0.20);
+  --border-glass: rgba(0, 0, 0, 0.08);
+  --border-subtle: rgba(0, 0, 0, 0.04);
+  --glass-bg: rgba(255, 255, 255, 0.60);
+  --glass-border: rgba(0, 0, 0, 0.05);
+  --error-bg: rgba(239, 68, 68, 0.08);
+  --error-border: rgba(239, 68, 68, 0.20);
+  --error-text: #dc2626;
+  --user-bubble: #2563eb;
+  --user-bubble-shadow: rgba(37, 99, 235, 0.15);
+  --scrollbar-thumb: rgba(184, 134, 11, 0.20);
+  --scrollbar-hover: rgba(184, 134, 11, 0.40);
+  --shimmer-from: rgba(0,0,0,0.02);
+  --shimmer-via: rgba(0,0,0,0.05);
+  --aurora-opacity: 0.06;
+  --dot-opacity: 0.025;
+  --loader-overlay: rgba(251, 249, 246, 0.92);
+  --sidebar-bg: rgba(255, 255, 255, 0.92);
+  --sidebar-shadow: rgba(0, 0, 0, 0.08);
+  --img-preview-bg: #f3f1ee;
+  --select-bg: rgba(0,0,0,0.04);
+  --select-border: rgba(0,0,0,0.10);
+  --chip-bg: rgba(0,0,0,0.04);
+  --chip-border: rgba(0,0,0,0.08);
+  --card-badge-bg: rgba(0,0,0,0.12);
+  --palette-card-bg: #FFFFFF;
+  color-scheme: light;
 }
 
 /* ============================================================
@@ -30,10 +98,13 @@ html, body, #root {
 }
 
 body {
-  background-color: var(--bg-void);
+  background-color: var(--bg-primary);
   color: var(--text-primary);
-  font-family: 'Outfit', 'Inter', system-ui, sans-serif;
+  font-family: 'DM Sans', system-ui, -apple-system, sans-serif;
   overflow: hidden;
+  transition: background-color 0.4s ease, color 0.4s ease;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 /* ============================================================
@@ -47,11 +118,11 @@ body {
   background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: rgba(245, 158, 11, 0.3);
+  background: var(--scrollbar-thumb);
   border-radius: 10px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(245, 158, 11, 0.5);
+  background: var(--scrollbar-hover);
 }
 
 /* ============================================================
@@ -63,116 +134,52 @@ body {
   z-index: 0;
   overflow: hidden;
   pointer-events: none;
+  transition: opacity 0.5s ease;
 }
 
 .aurora-orb {
   position: absolute;
   border-radius: 50%;
-  filter: blur(80px);
-  opacity: 0.12;
+  filter: blur(100px);
+  opacity: var(--aurora-opacity);
   animation: aurora-drift 20s ease-in-out infinite;
+  transition: opacity 0.5s ease;
 }
 
 .aurora-orb-1 {
-  width: 60vw;
-  height: 60vw;
-  background: radial-gradient(circle, #3b82f6, transparent 70%);
-  top: -20%;
-  left: -20%;
-  animation-delay: 0s;
-  animation-duration: 25s;
+  width: 50vw;
+  height: 50vw;
+  background: radial-gradient(circle, #D4AF37, transparent 70%);
+  top: -15%;
+  left: -15%;
+  animation-duration: 28s;
 }
 
 .aurora-orb-2 {
-  width: 50vw;
-  height: 50vw;
-  background: radial-gradient(circle, #f59e0b, transparent 70%);
-  bottom: -15%;
+  width: 45vw;
+  height: 45vw;
+  background: radial-gradient(circle, #8B6914, transparent 70%);
+  bottom: -10%;
   right: -10%;
-  animation-delay: -8s;
-  animation-duration: 20s;
+  animation-delay: -10s;
+  animation-duration: 22s;
 }
 
 .aurora-orb-3 {
-  width: 35vw;
-  height: 35vw;
-  background: radial-gradient(circle, #8b5cf6, transparent 70%);
-  top: 40%;
-  left: 40%;
-  animation-delay: -15s;
-  animation-duration: 30s;
-}
-
-.aurora-orb-4 {
-  width: 25vw;
-  height: 25vw;
-  background: radial-gradient(circle, #ec4899, transparent 70%);
-  top: 20%;
-  right: 25%;
-  animation-delay: -5s;
-  animation-duration: 18s;
+  width: 30vw;
+  height: 30vw;
+  background: radial-gradient(circle, #4A3C1A, transparent 70%);
+  top: 45%;
+  left: 35%;
+  animation-delay: -18s;
+  animation-duration: 32s;
 }
 
 @keyframes aurora-drift {
   0%, 100% { transform: translate(0, 0) scale(1); }
-  25% { transform: translate(4%, 6%) scale(1.05); }
-  50% { transform: translate(8%, -4%) scale(0.95); }
-  75% { transform: translate(-5%, 3%) scale(1.08); }
-}
-
-/* ============================================================
-   GLASSMORPHISM CARDS
-   ============================================================ */
-.glass-card {
-  background: var(--bg-card);
-  backdrop-filter: blur(24px);
-  -webkit-backdrop-filter: blur(24px);
-  border: 1px solid var(--border-glass);
-}
-
-.glass-sidebar {
-  background: rgba(6, 6, 12, 0.85);
-  backdrop-filter: blur(40px);
-  -webkit-backdrop-filter: blur(40px);
-  border-left: 1px solid var(--border-glass);
-}
-
-/* ============================================================
-   GOLDEN GLOW EFFECTS
-   ============================================================ */
-.glow-gold {
-  box-shadow: 0 0 20px var(--accent-gold-glow), 0 0 40px rgba(245, 158, 11, 0.1);
-}
-
-.glow-blue {
-  box-shadow: 0 0 20px var(--accent-blue-glow);
-}
-
-.text-gradient-gold {
-  background: linear-gradient(135deg, #f59e0b, #fbbf24, #f97316);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
-/* ============================================================
-   UPLOAD ZONE PARTICLES
-   ============================================================ */
-.upload-particle {
-  position: absolute;
-  width: 3px;
-  height: 3px;
-  border-radius: 50%;
-  background: var(--accent-gold);
-  opacity: 0;
-  animation: particle-float 4s ease-in-out infinite;
-}
-
-@keyframes particle-float {
-  0% { opacity: 0; transform: translateY(20px) scale(0); }
-  20% { opacity: 0.8; }
-  80% { opacity: 0.3; }
-  100% { opacity: 0; transform: translateY(-40px) scale(1.5); }
+  25% { transform: translate(3%, 5%) scale(1.04); }
+  50% { transform: translate(6%, -3%) scale(0.96); }
+  75% { transform: translate(-4%, 2%) scale(1.06); }
 }
 
 /* ============================================================
@@ -181,9 +188,9 @@ body {
 .shimmer {
   background: linear-gradient(
     90deg,
-    rgba(255,255,255,0.03) 0%,
-    rgba(255,255,255,0.08) 50%,
-    rgba(255,255,255,0.03) 100%
+    var(--shimmer-from) 0%,
+    var(--shimmer-via) 50%,
+    var(--shimmer-from) 100%
   );
   background-size: 200% 100%;
   animation: shimmer-sweep 1.8s ease-in-out infinite;
@@ -196,14 +203,14 @@ body {
 }
 
 /* ============================================================
-   TYPEWRITER ANIMATION (Belle Chat)
+   TYPEWRITER CURSOR
    ============================================================ */
 .typewriter-cursor::after {
   content: '|';
   animation: blink-cursor 0.8s step-end infinite;
-  color: var(--accent-gold);
+  color: var(--accent);
   font-weight: 300;
-  margin-left: 1px;
+  margin-left: 2px;
 }
 
 @keyframes blink-cursor {
@@ -212,34 +219,8 @@ body {
 }
 
 /* ============================================================
-   COLOR SWATCH MAGNETIC HOVER
-   ============================================================ */
-.color-swatch-magnetic {
-  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
-  will-change: transform;
-}
-
-.color-swatch-magnetic:hover {
-  transform: scale(1.12) translateY(-4px);
-}
-
-/* ============================================================
-   BORDER BEACON ANIMATION (Upload Zone Highlight)
-   ============================================================ */
-@keyframes beacon-pulse {
-  0%, 100% { box-shadow: 0 0 0px rgba(245,158,11,0.4); }
-  50% { box-shadow: 0 0 30px rgba(245,158,11,0.6), 0 0 60px rgba(245,158,11,0.2); }
-}
-
-.beacon-pulse {
-  animation: beacon-pulse 2s ease-in-out infinite;
-}
-
-/* ============================================================
    3D FLIP CARD
    ============================================================ */
-.perspective-1000 { perspective: 1000px; }
-.preserve-3d { transform-style: preserve-3d; }
 .backface-hidden { backface-visibility: hidden; }
 
 /* ============================================================
@@ -253,41 +234,53 @@ body {
 .animated-logo {
   background: linear-gradient(
     90deg,
-    #f59e0b 0%,
-    #fbbf24 30%,
-    #fef3c7 50%,
-    #fbbf24 70%,
-    #f59e0b 100%
+    var(--accent) 0%,
+    #E5C04B 35%,
+    #FFF4C8 50%,
+    #E5C04B 65%,
+    var(--accent) 100%
   );
   background-size: 200% auto;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
-  animation: logo-shimmer 4s linear infinite;
+  animation: logo-shimmer 5s linear infinite;
 }
 
 /* ============================================================
-   SCAN LINE EFFECT (Subtle futuristic texture)
-   ============================================================ */
-.scanlines::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: repeating-linear-gradient(
-    0deg,
-    transparent,
-    transparent 2px,
-    rgba(0,0,0,0.03) 2px,
-    rgba(0,0,0,0.03) 4px
-  );
-  pointer-events: none;
-  border-radius: inherit;
-}
-
-/* ============================================================
-   STAR DOT GRID (background texture)  
+   DOT GRID TEXTURE
    ============================================================ */
 .dot-grid {
-  background-image: radial-gradient(rgba(255,255,255,0.04) 1px, transparent 1px);
-  background-size: 32px 32px;
+  background-image: radial-gradient(rgba(128,128,128, var(--dot-opacity)) 1px, transparent 1px);
+  background-size: 28px 28px;
+}
+
+/* ============================================================
+   THEME TOGGLE BUTTON
+   ============================================================ */
+.theme-toggle {
+  position: fixed;
+  top: 24px;
+  right: 24px;
+  z-index: 100;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 1px solid var(--border-glass);
+  background: var(--glass-bg);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  color: var(--text-secondary);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+}
+
+.theme-toggle:hover {
+  background: var(--accent-subtle);
+  border-color: var(--accent);
+  color: var(--accent);
+  transform: rotate(15deg);
 }
