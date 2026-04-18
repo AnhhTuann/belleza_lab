@@ -54,29 +54,29 @@ import {
 
 // ─── THEME FACTORIES ─────────────────────────────────────────
 const DARK = {
-  bg: "#121417",
-  surface: "#1E2126",
-  surfaceAlpha: "rgba(30,33,38,0.75)",
-  accent: "#D4AF37",
-  accentHover: "#E5C04B",
-  text: "#F3F4F6",
-  textSec: "#9CA3AF",
-  glass: "rgba(0,0,0,0.30)",
-  glassBorder: "rgba(255,255,255,0.10)",
-  userBubble: "#2563eb",
-  sidebar: "rgba(18,20,23,0.92)",
+  bg: "#0A0A0A",
+  surface: "#171717",
+  surfaceAlpha: "rgba(23,23,23,0.75)",
+  accent: "#C29B7A",
+  accentHover: "#D1A98A",
+  text: "#F9FAFB",
+  textSec: "#D1D5DB",
+  glass: "rgba(0,0,0,0.40)",
+  glassBorder: "rgba(255,255,255,0.08)",
+  userBubble: "#1E3A8A",
+  sidebar: "rgba(10,10,10,0.92)",
 };
 const LIGHT = {
-  bg: "#FBF9F6",
+  bg: "#FAFAFA",
   surface: "#FFFFFF",
-  surfaceAlpha: "rgba(255,255,255,0.80)",
-  accent: "#B8860B",
-  accentHover: "#996F09",
-  text: "#1F2937",
-  textSec: "#6B7280",
-  glass: "rgba(255,255,255,0.60)",
+  surfaceAlpha: "rgba(255,255,255,0.85)",
+  accent: "#111827",
+  accentHover: "#1F2937",
+  text: "#111827",
+  textSec: "#4B5563",
+  glass: "rgba(255,255,255,0.80)",
   glassBorder: "rgba(0,0,0,0.05)",
-  userBubble: "#2563eb",
+  userBubble: "#1E3A8A",
   sidebar: "rgba(255,255,255,0.92)",
 };
 
@@ -91,17 +91,17 @@ function buildTheme(mode: "dark" | "light") {
       text: { primary: t.text, secondary: t.textSec },
     },
     typography: {
-      fontFamily: '"DM Sans", system-ui, -apple-system, sans-serif',
+      fontFamily: '"Inter", system-ui, -apple-system, sans-serif',
       fontSize: 16,
-      h1: { fontFamily: '"Cormorant Garamond", serif', fontWeight: 700 },
-      h2: { fontFamily: '"Cormorant Garamond", serif', fontWeight: 600 },
-      h5: { fontFamily: '"Cormorant Garamond", serif', fontWeight: 700 },
-      h6: { fontFamily: '"Cormorant Garamond", serif', fontWeight: 600 },
-      subtitle1: { fontFamily: '"Cormorant Garamond", serif', fontWeight: 700 },
+      h1: { fontFamily: '"Playfair Display", serif', fontWeight: 700 },
+      h2: { fontFamily: '"Playfair Display", serif', fontWeight: 600 },
+      h5: { fontFamily: '"Playfair Display", serif', fontWeight: 700 },
+      h6: { fontFamily: '"Playfair Display", serif', fontWeight: 600 },
+      subtitle1: { fontFamily: '"Playfair Display", serif', fontWeight: 700 },
       body1: { fontSize: "1rem" },
       body2: { fontSize: "1rem" },
     },
-    shape: { borderRadius: 14 },
+    shape: { borderRadius: 8 },
     components: {
       MuiPaper: { styleOverrides: { root: { backgroundImage: "none" } } },
       MuiButton: {
@@ -140,7 +140,7 @@ const AccentButton = styled(Button)(() => ({
   background: "var(--accent)",
   color: "#fff",
   fontWeight: 700,
-  borderRadius: 50,
+  borderRadius: 8,
   padding: "10px 24px",
   "&:hover": {
     background: "var(--accent-hover)",
@@ -154,7 +154,7 @@ const GhostButton = styled(Button)(() => ({
   background: "var(--glass-bg)",
   border: "1px solid var(--border-glass)",
   color: "var(--text-secondary)",
-  borderRadius: 50,
+  borderRadius: 8,
   "&:hover": {
     background: "var(--accent-subtle)",
     borderColor: "var(--accent)",
@@ -263,7 +263,7 @@ const ArtLoader = () => (
     </Box>
     <Typography
       sx={{
-        fontFamily: '"Cormorant Garamond", serif',
+        fontFamily: '"Playfair Display", serif',
         fontStyle: "italic",
         color: "var(--text-primary)",
         fontSize: "1.15rem",
@@ -338,7 +338,7 @@ const ColorFlipCard: React.FC<{ color: any; unfitInfo: any }> = ({
             background: "var(--bg-surface-alpha)",
             border: `1px solid ${unfitInfo ? "var(--error-border)" : "var(--border-glass)"}`,
             backdropFilter: "blur(16px)",
-            borderRadius: 3,
+            borderRadius: 1.5,
             p: 2.5,
             display: "flex",
             flexDirection: "column",
@@ -393,7 +393,7 @@ const ColorFlipCard: React.FC<{ color: any; unfitInfo: any }> = ({
             <Typography
               variant="caption"
               sx={{
-                fontFamily: '"DM Sans", monospace',
+                fontFamily: '"Inter", monospace',
                 color: "var(--text-secondary)",
                 background: "var(--chip-bg)",
                 px: 1,
@@ -430,7 +430,7 @@ const ColorFlipCard: React.FC<{ color: any; unfitInfo: any }> = ({
             background: "var(--bg-surface)",
             border: "1px solid var(--border-glass)",
             backdropFilter: "blur(20px)",
-            borderRadius: 3,
+            borderRadius: 1.5,
             p: 2.5,
             transform: "rotateY(180deg)",
             display: "flex",
@@ -519,7 +519,7 @@ const ColorFlipCard: React.FC<{ color: any; unfitInfo: any }> = ({
             sx={{
               color: "var(--text-secondary)",
               lineHeight: 1.7,
-              fontFamily: '"Cormorant Garamond", serif',
+              fontFamily: '"Playfair Display", serif',
               fontStyle: "italic",
               fontSize: "1.1rem",
               overflow: "auto",
@@ -643,7 +643,7 @@ const PaletteCard = ({
                 letterSpacing: "0.2em",
                 textTransform: "uppercase",
                 color: "var(--accent)",
-                fontFamily: '"Cormorant Garamond", serif',
+                fontFamily: '"Playfair Display", serif',
                 mb: 5,
                 fontWeight: 700,
                 fontSize: "1.5rem",
@@ -727,7 +727,7 @@ const PaletteCard = ({
               <Typography
                 component="div"
                 sx={{
-                  fontFamily: '"Cormorant Garamond", serif',
+                  fontFamily: '"Playfair Display", serif',
                   color: "var(--text-primary)",
                   lineHeight: 1.8,
                   fontSize: "1.25rem",
@@ -1131,12 +1131,12 @@ export default function App() {
               <Typography
                 variant="body2"
                 sx={{
-                  color: "var(--accent)",
-                  fontFamily: '"Cormorant Garamond", serif',
+                  color: "var(--text-primary)",
+                  fontFamily: '"Playfair Display", serif',
                   fontStyle: "italic",
                   mt: 0.5,
-                  opacity: 0.6,
-                  fontSize: "0.85rem",
+                  opacity: 0.85,
+                  fontSize: "1rem",
                 }}
               >
                 Nàng thơ ảo Belle luôn bên bạn
@@ -1273,7 +1273,7 @@ export default function App() {
                                   fontSize: "0.78rem",
                                   cursor: "pointer",
                                   outline: "none",
-                                  fontFamily: '"DM Sans", sans-serif',
+                                  fontFamily: '"Inter", sans-serif',
                                 }}
                               >
                                 {sel.opts.map(([v, l]) => (
@@ -1306,7 +1306,7 @@ export default function App() {
                     style={{
                       width: "100%",
                       aspectRatio: "16/9",
-                      borderRadius: 20,
+                      borderRadius: 12,
                       border: `2px dashed ${isDragging ? dragBorderCol : borderCol}`,
                       background: isDragging ? dragBg : "var(--glass-bg)",
                       cursor: "pointer",
@@ -1779,7 +1779,7 @@ export default function App() {
                                         color: "text.secondary",
                                         lineHeight: 1.8,
                                         fontFamily:
-                                          '"Cormorant Garamond", serif',
+                                          '"Playfair Display", serif',
                                         fontStyle: "italic",
                                         whiteSpace: "pre-wrap",
                                         fontSize: "1.2rem",
@@ -1886,7 +1886,7 @@ export default function App() {
                                     sx={{
                                       color: "text.secondary",
                                       lineHeight: 1.8,
-                                      fontFamily: '"Cormorant Garamond", serif',
+                                      fontFamily: '"Playfair Display", serif',
                                       fontStyle: "italic",
                                       mb: 2.5,
                                       fontSize: "1.2rem",
@@ -2030,84 +2030,76 @@ export default function App() {
                                       return (
                                         <motion.div
                                           key={i}
-                                          whileHover={{ scale: 1.04, y: -4 }}
-                                          whileTap={{ scale: 0.96 }}
+                                          whileHover={{ y: -2 }}
+                                          whileTap={{ scale: 0.98 }}
                                           onClick={() =>
                                             setSelectedColor(color)
                                           }
                                           style={{
-                                            borderRadius: 14,
-                                            padding: "14px",
-                                            minHeight: 140,
+                                            borderRadius: 12,
+                                            padding: "16px",
+                                            display: "flex",
+                                            alignItems: "center",
+                                            gap: "16px",
                                             cursor: "pointer",
-                                            backgroundColor: color.hex,
+                                            background: isSelected ? "var(--accent-subtle)" : "var(--bg-surface)",
+                                            border: `1px solid ${isSelected ? "var(--accent)" : "var(--border-glass)"}`,
+                                            boxShadow: isSelected ? "0 4px 20px var(--accent-glow)" : "none",
                                             position: "relative",
                                             overflow: "hidden",
-                                            boxShadow: isSelected
-                                              ? `0 0 0 2px ${tc === "#ffffff" ? "rgba(255,255,255,0.8)" : "rgba(0,0,0,0.6)"}, 0 0 0 4px #6366f1`
-                                              : `0 6px 20px ${color.hex}33`,
+                                            transition: "all 0.25s ease",
                                           }}
                                         >
-                                          <Typography
-                                            variant="caption"
-                                            style={{
-                                              color: tc,
-                                              opacity: 0.6,
-                                              fontWeight: 700,
-                                              textTransform: "uppercase",
-                                              letterSpacing: "0.1em",
-                                              fontSize: "0.85rem",
-                                              display: "block",
-                                            }}
-                                          >
-                                            {color.role}
-                                          </Typography>
                                           <Box
-                                            style={{
-                                              position: "absolute",
-                                              bottom: 10,
-                                              left: 10,
+                                            sx={{
+                                              width: 48,
+                                              height: 48,
+                                              borderRadius: "50%",
+                                              backgroundColor: color.hex,
+                                              border: "1px solid var(--border-glass)",
+                                              boxShadow: `0 4px 12px ${color.hex}66`,
+                                              flexShrink: 0,
                                             }}
-                                          >
+                                          />
+                                          <Box sx={{ flex: 1, display: "flex", flexDirection: "column" }}>
                                             <Typography
-                                              variant="body2"
-                                              style={{
-                                                color: tc,
+                                              variant="caption"
+                                              sx={{
+                                                color: "text.secondary",
+                                                fontWeight: 700,
+                                                textTransform: "uppercase",
+                                                letterSpacing: "0.15em",
+                                                fontSize: "0.65rem",
+                                                mb: 0.3,
+                                              }}
+                                            >
+                                              {color.role}
+                                            </Typography>
+                                            <Typography
+                                              variant="body1"
+                                              sx={{
+                                                color: "text.primary",
                                                 fontWeight: 700,
                                                 fontSize: "1.15rem",
+                                                fontFamily: '"Playfair Display", serif',
                                               }}
                                             >
                                               {color.name}
                                             </Typography>
                                             <Typography
                                               variant="caption"
-                                              style={{
-                                                color: tc,
-                                                opacity: 0.6,
-                                                fontFamily: "monospace",
-                                                fontSize: "0.9rem",
+                                              sx={{
+                                                color: "text.secondary",
+                                                fontFamily: '"Inter", monospace',
+                                                fontSize: "0.85rem",
                                               }}
                                             >
                                               {color.hex}
                                             </Typography>
                                           </Box>
                                           {isSelected && (
-                                            <Box
-                                              style={{
-                                                position: "absolute",
-                                                top: 6,
-                                                right: 6,
-                                                background:
-                                                  "var(--card-badge-bg)",
-                                                borderRadius: "50%",
-                                                padding: 2,
-                                                display: "flex",
-                                              }}
-                                            >
-                                              <CheckCircle
-                                                size={13}
-                                                color={tc}
-                                              />
+                                            <Box sx={{ color: "var(--accent)", display: "flex" }}>
+                                              <CheckCircle size={20} />
                                             </Box>
                                           )}
                                         </motion.div>
@@ -2178,7 +2170,7 @@ export default function App() {
                                             color: "text.secondary",
                                             lineHeight: 1.8,
                                             fontFamily:
-                                              '"Cormorant Garamond", serif',
+                                              '"Playfair Display", serif',
                                             fontStyle: "italic",
                                             pl: 1,
                                             fontSize: "1.2rem",
@@ -2208,7 +2200,7 @@ export default function App() {
                               inset: 0,
                               display: "flex",
                               flexDirection: "column",
-                              borderRadius: 16,
+                              borderRadius: 12,
                               border: `1px solid ${borderCol}`,
                               overflow: "hidden",
                               background: "var(--glass-bg)",
@@ -2240,7 +2232,7 @@ export default function App() {
                                       borderRadius: 2,
                                       background: `linear-gradient(135deg, var(--accent), #8B6914)`,
                                       fontSize: "1.2rem",
-                                      fontFamily: '"Cormorant Garamond", serif',
+                                      fontFamily: '"Playfair Display", serif',
                                       fontWeight: 700,
                                       boxShadow:
                                         "0 3px 12px var(--accent-glow)",
@@ -2320,7 +2312,7 @@ export default function App() {
                                     variant="body2"
                                     sx={{
                                       lineHeight: 1.7,
-                                      fontFamily: '"Cormorant Garamond", serif',
+                                      fontFamily: '"Playfair Display", serif',
                                       fontStyle: "italic",
                                       fontSize: "1.2rem",
                                     }}
@@ -2371,7 +2363,7 @@ export default function App() {
                                         lineHeight: 1.7,
                                         fontFamily:
                                           msg.role === "model"
-                                            ? '"Cormorant Garamond", serif'
+                                            ? '"Playfair Display", serif'
                                             : "inherit",
                                         fontStyle:
                                           msg.role === "model"
@@ -2530,7 +2522,7 @@ export default function App() {
                                       "& input": {
                                         color: "var(--text-primary)",
                                         fontSize: "0.82rem",
-                                        fontFamily: '"DM Sans", sans-serif',
+                                        fontFamily: '"Inter", sans-serif',
                                       },
                                     },
                                   }}
