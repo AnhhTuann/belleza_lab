@@ -1,7 +1,7 @@
 import React from "react";
 import { Box, Typography, Zoom } from "@mui/material";
 import { motion, AnimatePresence } from "motion/react";
-import { UploadCloud, RefreshCw, AlertTriangle } from "lucide-react";
+import { UploadCloud, RefreshCw, AlertTriangle, Wand2 } from "lucide-react";
 import { GlassCard, GhostButton } from "../ui/StyledComponents";
 import { ArtLoader } from "../ui/ArtLoader";
 
@@ -10,7 +10,8 @@ export const MainContent = ({
   isSketch, setIsSketch, selectedStyle, setSelectedStyle,
   paintType, setPaintType, fileInputRef,
   handleDrop, handleFileChange, resetApp, setIsDragging,
-  isDark, accentCol, dragBorderCol, dragBg, dragGlow, borderCol
+  isDark, accentCol, dragBorderCol, dragBg, dragGlow, borderCol,
+  onOpenSidebar, showSidebarButton
 }: any) => {
   return (
     <Box
@@ -24,7 +25,7 @@ export const MainContent = ({
         p: { xs: 2.5, md: 6 },
         overflowY: { xs: "visible", md: "auto" },
         height: { xs: "auto", md: "100%" },
-        minHeight: { xs: "100vh", md: "100%" },
+        minHeight: { xs: imageSrc ? "auto" : "100vh", md: "100%" },
       }}
     >
       <Box sx={{ width: "100%", maxWidth: 680, display: "flex", flexDirection: "column", alignItems: "center" }}>

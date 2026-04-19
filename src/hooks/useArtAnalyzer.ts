@@ -1,15 +1,27 @@
 import React, { useState, useRef, useEffect } from "react";
 import imageCompression from "browser-image-compression";
-import { analyzeArt, ArtAnalysisResult, FinalPaletteColor, ChatMessage } from "../services/geminiService";
+import {
+  analyzeArt,
+  ArtAnalysisResult,
+  FinalPaletteColor,
+  ChatMessage,
+} from "../services/geminiService";
 
-export const useArtAnalyzer = (setChatHistory: React.Dispatch<React.SetStateAction<ChatMessage[]>>) => {
+export const useArtAnalyzer = (
+  setChatHistory: React.Dispatch<React.SetStateAction<ChatMessage[]>>,
+) => {
   const [imageSrc, setImageSrc] = useState<string | null>(null);
   const [isDragging, setIsDragging] = useState(false);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
-  const [analysisResult, setAnalysisResult] = useState<ArtAnalysisResult | null>(null);
+  const [analysisResult, setAnalysisResult] =
+    useState<ArtAnalysisResult | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState<"current" | "optimized" | "belle">("current");
-  const [selectedColor, setSelectedColor] = useState<FinalPaletteColor | null>(null);
+  const [activeTab, setActiveTab] = useState<"current" | "optimized" | "belle">(
+    "current",
+  );
+  const [selectedColor, setSelectedColor] = useState<FinalPaletteColor | null>(
+    null,
+  );
   const [base64Image, setBase64Image] = useState<string | null>(null);
   const [mimeType, setMimeType] = useState<string | null>(null);
   const [isSketch, setIsSketch] = useState(false);
@@ -19,7 +31,12 @@ export const useArtAnalyzer = (setChatHistory: React.Dispatch<React.SetStateActi
   const fileInputRef = useRef<HTMLInputElement>(null);
   const abortControllerRef = useRef<AbortController | null>(null);
 
-  useEffect(() => () => { abortControllerRef.current?.abort(); }, []);
+  useEffect(
+    () => () => {
+      abortControllerRef.current?.abort();
+    },
+    [],
+  );
 
   const resetApp = () => {
     abortControllerRef.current?.abort();
@@ -76,7 +93,7 @@ export const useArtAnalyzer = (setChatHistory: React.Dispatch<React.SetStateActi
             setChatHistory([
               {
                 role: "model",
-                text: `Chào Tuấn! Bức phác thảo này gợi cảm giác ${analysis.determined_mood}. Belle đã chọn bảng màu phong cách ${analysis.suggested_style}. Bạn thấy sao?`,
+                text: `Chào bạn! Bức phác thảo này gợi cảm giác ${analysis.determined_mood}. Belle đã chọn bảng màu phong cách ${analysis.suggested_style}. Bạn thấy sao?`,
               },
             ]);
           }
@@ -111,14 +128,30 @@ export const useArtAnalyzer = (setChatHistory: React.Dispatch<React.SetStateActi
   };
 
   return {
-    imageSrc, base64Image, mimeType, isDragging, setIsDragging,
-    isAnalyzing, setIsAnalyzing, analysisResult, setAnalysisResult, error, setError,
-    activeTab, setActiveTab,
-    selectedColor, setSelectedColor,
-    isSketch, setIsSketch,
-    selectedStyle, setSelectedStyle,
-    paintType, setPaintType,
+    imageSrc,
+    base64Image,
+    mimeType,
+    isDragging,
+    setIsDragging,
+    isAnalyzing,
+    setIsAnalyzing,
+    analysisResult,
+    setAnalysisResult,
+    error,
+    setError,
+    activeTab,
+    setActiveTab,
+    selectedColor,
+    setSelectedColor,
+    isSketch,
+    setIsSketch,
+    selectedStyle,
+    setSelectedStyle,
+    paintType,
+    setPaintType,
     fileInputRef,
-    resetApp, handleDrop, handleFileChange
+    resetApp,
+    handleDrop,
+    handleFileChange,
   };
 };

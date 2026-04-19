@@ -1,7 +1,7 @@
 import React from "react";
-import { Box, Typography } from "@mui/material";
+import { Box, Typography, IconButton, Collapse } from "@mui/material";
 import { motion, AnimatePresence } from "motion/react";
-import { Droplet, Info, Palette, Sparkles, CheckCircle } from "lucide-react";
+import { Droplet, Info, Palette, Sparkles, CheckCircle, ChevronDown, ChevronUp } from "lucide-react";
 import { GlassCard } from "../ui/StyledComponents";
 import { ColorFlipCard } from "../palette/ColorFlipCard";
 
@@ -11,6 +11,8 @@ const containerVariants = {
 };
 
 export const CurrentTabContent = ({ isSketch, analysisResult, accentCol }: any) => {
+  const [showGuide, setShowGuide] = React.useState(false);
+
   return (
     <motion.div
       key="current"
@@ -33,14 +35,21 @@ export const CurrentTabContent = ({ isSketch, analysisResult, accentCol }: any) 
 
         {isSketch && analysisResult.placement_guide && (
           <Box>
-            <Typography variant="overline" sx={{ color: accentCol, letterSpacing: "0.15em", fontSize: "0.6rem", display: "flex", alignItems: "center", gap: 0.8, mb: 1.5, fontWeight: 600 }}>
-              <Info size={12} /> Hướng dẫn tô màu
-            </Typography>
-            <GlassCard sx={{ p: 3 }}>
-              <Typography variant="body2" sx={{ color: "text.secondary", lineHeight: 1.8, fontFamily: '"Playfair Display", serif', fontStyle: "italic", whiteSpace: "pre-wrap", fontSize: "1.2rem" }}>
-                {analysisResult.placement_guide}
+            <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", mb: 1.5 }}>
+              <Typography variant="overline" sx={{ color: accentCol, letterSpacing: "0.15em", fontSize: "0.6rem", display: "flex", alignItems: "center", gap: 0.8, fontWeight: 600 }}>
+                <Info size={12} /> Hướng dẫn tô màu
               </Typography>
-            </GlassCard>
+              <IconButton onClick={() => setShowGuide(!showGuide)} size="small" sx={{ color: accentCol, p: 0.5 }}>
+                {showGuide ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+              </IconButton>
+            </Box>
+            <Collapse in={showGuide}>
+              <GlassCard sx={{ p: 3 }}>
+                <Typography variant="body2" sx={{ color: "text.secondary", lineHeight: 1.8, fontFamily: '"Playfair Display", serif', fontStyle: "italic", whiteSpace: "pre-wrap", fontSize: "1.2rem" }}>
+                  {analysisResult.placement_guide}
+                </Typography>
+              </GlassCard>
+            </Collapse>
           </Box>
         )}
 
