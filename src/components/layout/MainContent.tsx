@@ -1,14 +1,14 @@
 import React from "react";
 import { Box, Typography, Zoom } from "@mui/material";
 import { motion, AnimatePresence } from "motion/react";
-import { UploadCloud, RefreshCw, AlertTriangle, Wand2 } from "lucide-react";
+import { UploadCloud, RefreshCw, AlertTriangle, Wand2, Camera } from "lucide-react";
 import { GlassCard, GhostButton } from "../ui/StyledComponents";
 import { ArtLoader } from "../ui/ArtLoader";
 
 export const MainContent = ({
   imageSrc, isDragging, isAnalyzing, error,
   isSketch, setIsSketch, selectedStyle, setSelectedStyle,
-  paintType, setPaintType, fileInputRef,
+  paintType, setPaintType, fileInputRef, cameraInputRef,
   handleDrop, handleFileChange, resetApp, setIsDragging,
   isDark, accentCol, dragBorderCol, dragBg, dragGlow, borderCol
 }: any) => {
@@ -160,6 +160,7 @@ export const MainContent = ({
                 }}
               >
                 <input ref={fileInputRef} type="file" accept="image/*" onChange={handleFileChange} style={{ display: "none" }} />
+                <input ref={cameraInputRef} type="file" accept="image/*" capture="environment" onChange={handleFileChange} style={{ display: "none" }} />
                 {[
                   { top: 14, left: 14, bt: true, bl: true },
                   { top: 14, right: 14, bt: true, br: true },
@@ -197,9 +198,26 @@ export const MainContent = ({
                 <Typography variant="h6" sx={{ color: isDragging ? accentCol : "text.primary", mb: 0.5, fontWeight: 600, transition: "color 0.3s", fontSize: "1.1rem" }}>
                   Phóng tác phẩm của bạn
                 </Typography>
-                <Typography variant="body2" sx={{ color: "text.secondary", textTransform: "uppercase", letterSpacing: "0.12em", fontSize: "0.7rem" }}>
+                <Typography variant="body2" sx={{ color: "text.secondary", textTransform: "uppercase", letterSpacing: "0.12em", fontSize: "0.7rem", mb: 3 }}>
                   Kéo thả hoặc nhấn để chọn ảnh
                 </Typography>
+                
+                <Box sx={{ display: "flex", gap: 2 }}>
+                  <GhostButton 
+                    onClick={(e: React.MouseEvent) => {
+                      e.stopPropagation();
+                      cameraInputRef.current?.click();
+                    }}
+                    sx={{ 
+                      background: "var(--accent-subtle)", 
+                      color: "var(--accent)", 
+                      border: `1px solid var(--accent)22`,
+                      px: 3
+                    }}
+                  >
+                    <Camera size={18} style={{ marginRight: 8 }} /> Chụp ảnh
+                  </GhostButton>
+                </Box>
               </motion.div>
             </motion.div>
           ) : (

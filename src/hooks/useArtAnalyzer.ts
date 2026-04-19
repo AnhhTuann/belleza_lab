@@ -29,6 +29,7 @@ export const useArtAnalyzer = (
   const [paintType, setPaintType] = useState("Poster Color");
 
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const cameraInputRef = useRef<HTMLInputElement>(null);
   const abortControllerRef = useRef<AbortController | null>(null);
 
   useEffect(
@@ -50,6 +51,7 @@ export const useArtAnalyzer = (
     setSelectedColor(null);
     setChatHistory([]);
     if (fileInputRef.current) fileInputRef.current.value = "";
+    if (cameraInputRef.current) cameraInputRef.current.value = "";
   };
 
   const processFile = async (file: File) => {
@@ -150,6 +152,7 @@ export const useArtAnalyzer = (
     paintType,
     setPaintType,
     fileInputRef,
+    cameraInputRef,
     resetApp,
     handleDrop,
     handleFileChange,
