@@ -10,8 +10,7 @@ export const MainContent = ({
   isSketch, setIsSketch, selectedStyle, setSelectedStyle,
   paintType, setPaintType, fileInputRef,
   handleDrop, handleFileChange, resetApp, setIsDragging,
-  isDark, accentCol, dragBorderCol, dragBg, dragGlow, borderCol,
-  onOpenSidebar, showSidebarButton
+  isDark, accentCol, dragBorderCol, dragBg, dragGlow, borderCol
 }: any) => {
   return (
     <Box

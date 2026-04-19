@@ -124,8 +124,6 @@ export default function App() {
           {...analyzerProps} 
           isDark={isDark} accentCol={accentCol} borderCol={borderCol} 
           dragBorderCol={dragBorderCol} dragBg={dragBg} dragGlow={dragGlow}
-          onOpenSidebar={() => setShowMobileSidebar(!showMobileSidebar)}
-          showSidebarButton={isMobile && !!(isAnalyzing || analysisResult)}
         />
 
         {/* R Sidebar Analytics/Chat */}
@@ -184,7 +182,7 @@ export default function App() {
                       >
                         <Box sx={{ position: "relative", width: "100%", display: "flex", justifyContent: "center", flexShrink: 0, pt: 1, pb: 1, cursor: "grab", "&:active": { cursor: "grabbing" } }}>
                           <Box sx={{ width: 48, height: 5, bgcolor: "text.disabled", borderRadius: 3, mt: 1, mb: 1, opacity: 0.8 }} />
-                          <IconButton onClick={() => setShowMobileSidebar(false)} sx={{ position: "absolute", top: 8, right: 12, color: "text.secondary" }}>
+                          <IconButton aria-label="Đóng cửa sổ" onClick={() => setShowMobileSidebar(false)} sx={{ position: "absolute", top: 8, right: 12, color: "text.secondary" }}>
                             <X size={20} />
                           </IconButton>
                         </Box>
@@ -225,6 +223,7 @@ export default function App() {
           >
             <Fab
               variant="extended"
+              aria-label="Mở Phân Tích"
               onClick={() => setShowMobileSidebar(true)}
               sx={{
                 background: "var(--accent)", color: "var(--bg-surface)",
@@ -233,7 +232,7 @@ export default function App() {
                 "&:hover": { background: "var(--accent-subtle)", color: "var(--accent)" }
               }}
             >
-              <Wand2 style={{ marginRight: 8 }} size={20} /> Mở Phân Tích
+              <Wand2 style={{ marginRight: 8 }} size={20} aria-hidden="true" /> Mở Phân Tích
             </Fab>
           </motion.div>
         )}
