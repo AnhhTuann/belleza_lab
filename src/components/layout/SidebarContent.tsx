@@ -145,7 +145,7 @@ export const OptimizedTabContent = ({ analysisResult, selectedColor, setSelected
                   <Collapse in={isSelected}>
                     <Box sx={{ p: 2, pt: 0, pb: 2.5, position: "relative" }}>
                       <Box sx={{ position: "absolute", top: 0, left: 16, width: 3, height: "calc(100% - 24px)", bgcolor: color.hex, borderRadius: 2 }} />
-                      <Typography variant="body2" sx={{ fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.06em", fontSize: "0.85rem", mb: 1, pl: 2.5, color: "text.primary", display: "flex", alignItems: "center", gap: 1 }}>
+                      <Typography component="div" variant="body2" sx={{ fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.06em", fontSize: "0.85rem", mb: 1, pl: 2.5, color: "text.primary", display: "flex", alignItems: "center", gap: 1 }}>
                         <Box sx={{ width: 12, height: 12, borderRadius: "50%", bgcolor: color.hex, border: `1px solid ${borderCol}`, flexShrink: 0 }} />
                         Công thức: {color.name}
                       </Typography>
