@@ -8,15 +8,19 @@ Chào mừng bạn đến với **Belleza Lab**, một ứng dụng phân tích 
 
 ```text
 ├── src/
+│   ├── components/            # Các Components bóc tách (UI, Layout, Chat, Palette...)
+│   ├── hooks/                 # Custom Hooks quản lý trạng thái (useAppTheme, useArtAnalyzer, userBelleChat)
 │   ├── services/
-│   │   └── geminiService.ts # Logic kết nối với Google Gemini API
-│   ├── App.tsx              # File chính chứa toàn bộ giao diện (MUI) và logic
-│   ├── main.tsx             # Điểm khởi đầu của ứng dụng React
-│   └── index.css            # Custom animations (Aurora, Shimmer, Particles)
-├── public/                  # Các tài nguyên tĩnh
-├── package.json             # Danh sách dependencies (MUI, Framer Motion, v.v.)
-├── tsconfig.json            # Cấu hình TypeScript cho MUI & React
-└── vite.config.ts           # Cấu hình Vite (loại bỏ Tailwind plugin)
+│   │   └── geminiService.ts   # Logic kết nối với Google Gemini API
+│   ├── theme/
+│   │   └── index.ts           # Hệ thống cấu hình màu sắc (DARK / LIGHT objects)
+│   ├── App.tsx                # Component gốc dùng để kết nối các Layout
+│   ├── main.tsx               # Điểm khởi đầu của ứng dụng React
+│   └── index.css              # Custom animations (Aurora, Shimmer, Particles)
+├── public/                    # Các tài nguyên tĩnh
+├── package.json               # Danh sách dependencies
+├── tsconfig.json              # Cấu hình TypeScript
+└── vite.config.ts             # Cấu hình Vite
 ```
 
 ---
@@ -38,17 +42,18 @@ Chào mừng bạn đến với **Belleza Lab**, một ứng dụng phân tích 
 
 ## 3. Chi tiết các File quan trọng
 
-### 📂 `src/App.tsx` (Trái tim của ứng dụng)
+### 📂 Thư mục `src/components/`, `src/hooks/` & `src/App.tsx` (Kiến trúc linh hoạt)
 
-Đây là file quan trọng nhất, đã được chuyển đổi sang **Material UI**:
+Ứng dụng áp dụng thiết kế Clean Architecture để tái sử dụng mã nguồn hiệu quả:
 
-- **ThemeProvider:** Quản lý Dark Theme tùy chỉnh (Gold & Blue accents).
-- **MUI Components:** Sử dụng `Box`, `Paper`, `Stack` thay cho div/flexbox truyền thống.
-- **Glassmorphism:** Các thẻ UI được thiết kế với độ mờ (blur) cao và viền kính siêu mỏng.
-- **Components nội bộ:**
-  - `PaletteCard`: Thẻ màu phong cách Minimalist Gallery chuyên biệt.
-  - `ColorFlipCard`: Thẻ màu 3D sử dụng `motion` để lật xem công thức.
-  - `ArtLoader`: Animation chờ mang phong cách huyền ảo.
+- **`App.tsx`:** Container chính gọn nhẹ, chịu trách nhiệm kết nối Layout (Main Content, Sidebar).
+- **`src/hooks/`**: Toàn bộ Logic quản lý state, API, Upload ảnh được tách biệt rõ ràng (`useArtAnalyzer`, `useBelleChat`, `useAppTheme`).
+- **`src/theme/`**: Quản lý thiết kế Dark Theme/Light Theme cùng các màu nền.
+- **`src/components/`**: Các mảnh ghép UI UI chuyên biệt:
+  - `PaletteCard`: Thẻ màu tải xuống phong cách Minimalist Gallery.
+  - `ColorFlipCard`: Thẻ màu 3D xoay lật công thức (Framer Motion).
+  - `BelleChatBox`: Giao diện chatbot tự động auto-scroll nhẹ nhàng với bóng viền glassmorphism.
+  - `ArtLoader`: Animation hạt sáng, quang cầu lúc chờ API phản hồi.
 
 ### 📂 `src/services/geminiService.ts` (Bộ não AI)
 

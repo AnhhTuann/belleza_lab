@@ -13,6 +13,7 @@ View your app in AI Studio: [Belleza Lab](https://ai.studio/apps/f7f4f54b-ca10-4
 ## ✨ Tính năng cao cấp
 - 🌗 **Dual-Theme Editorial Design**: Hai giao diện chuẩn phòng tranh: *The Night Gallery* sang trọng (Vàng Champagne) và *The Minimalist Studio* tối giản (Xanh Navy).
 - 🖋️ **Professional Typography**: Được thay máu hoàn toàn với bộ đôi quyền lực `Inter` (nét chuẩn UI hiện đại) và `Playfair Display` (cổ điển, tinh tế như báo Vogue).
+- 🧩 **Clean Architecture**: Mã nguồn được refactor theo chuẩn thư mục `components`, `hooks`, `theme` chuyên biệt, bảo trì mở rộng dễ dàng.
 - 🎨 **Minimalist Palette Cards**: Các thẻ màu được thiết kế dạng khối ngang hiện đại với color swatch bóng bẩy, loại bỏ sự cồng kềnh, tối ưu trải nghiệm cho Artist.
 - ✨ **Dynamic Animations**: Hiệu ứng chuyển động mượt mà (Framer Motion) ở mọi tương tác, hover thẻ bài và Chatbox.
 - 💬 **Nàng thơ Belle**: Giao diện trò chuyện tương tác với chế độ "Final Review", cung cấp lời khuyên phối màu chuyên sâu trực tiếp.
