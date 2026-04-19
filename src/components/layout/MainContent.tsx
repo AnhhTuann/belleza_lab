@@ -21,9 +21,10 @@ export const MainContent = ({
         flexDirection: "column",
         alignItems: "center",
         justifyContent: "center",
-        p: { xs: 3, md: 6 },
-        overflowY: "auto",
-        height: "100%",
+        p: { xs: 2.5, md: 6 },
+        overflowY: { xs: "visible", md: "auto" },
+        height: { xs: "auto", md: "100%" },
+        minHeight: { xs: "100vh", md: "100%" },
       }}
     >
       <Box sx={{ width: "100%", maxWidth: 680, display: "flex", flexDirection: "column", alignItems: "center" }}>

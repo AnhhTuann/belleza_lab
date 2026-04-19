@@ -64,7 +64,7 @@ export default function App() {
         )}
       </AnimatePresence>
 
-      <Box sx={{ position: "relative", zIndex: 1, display: "flex", flexDirection: { xs: "column", md: "row" }, height: "100vh", overflow: "hidden" }}>
+      <Box sx={{ position: "relative", zIndex: 1, display: "flex", flexDirection: { xs: "column", md: "row" }, height: { xs: "auto", md: "100vh" }, minHeight: "100vh", overflow: { xs: "visible", md: "hidden" } }}>
         
         {/* L Main Upload/Preview  */}
         <MainContent 
@@ -76,12 +76,16 @@ export default function App() {
         {/* R Sidebar Analytics/Chat */}
         <AnimatePresence>
           {(isAnalyzing || analysisResult) && (
-            <motion.aside
+            <Box
+              component={motion.aside}
+              custom={{}}
               key="sidebar" initial={{ x: "100%", opacity: 0 }} animate={{ x: 0, opacity: 1 }} exit={{ x: "100%", opacity: 0 }}
               transition={{ type: "spring", damping: 26, stiffness: 200 }}
-              style={{
-                width: "100%", maxWidth: 460, height: "100vh", overflowY: "auto", flexShrink: 0, display: "flex", flexDirection: "column",
-                background: "var(--sidebar-bg)", backdropFilter: "blur(40px)", borderLeft: `1px solid ${borderCol}`,
+              sx={{
+                width: "100%", maxWidth: { xs: "100%", md: 460 }, height: { xs: "auto", md: "100vh" }, minHeight: { xs: "100vh", md: "auto" },
+                overflowY: { xs: "visible", md: "auto" }, flexShrink: 0, display: "flex", flexDirection: "column",
+                background: "var(--sidebar-bg)", backdropFilter: "blur(40px)", 
+                borderLeft: { xs: "none", md: `1px solid ${borderCol}` }, borderTop: { xs: `1px solid ${borderCol}`, md: "none" },
                 boxShadow: `-16px 0 48px var(--sidebar-shadow)`, transition: "background 0.3s, border-color 0.3s",
               }}
             >
@@ -133,7 +137,7 @@ export default function App() {
                   </Box>
                 ) : null}
               </Box>
-            </motion.aside>
+            </Box>
           )}
         </AnimatePresence>
       </Box>

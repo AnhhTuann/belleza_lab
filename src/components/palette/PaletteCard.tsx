@@ -74,12 +74,13 @@ export const PaletteCard = ({
           <IconButton
             onClick={onClose}
             sx={{
-              position: "absolute",
-              top: -56,
-              right: 0,
-              color: "rgba(255,255,255,0.6)",
-              background: "rgba(255,255,255,0.1)",
-              "&:hover": { background: "rgba(255,255,255,0.2)" },
+              position: { xs: "fixed", md: "absolute" },
+              top: { xs: 16, md: -56 },
+              right: { xs: 16, md: 0 },
+              zIndex: 50,
+              color: "rgba(255,255,255,0.8)",
+              background: "rgba(255,255,255,0.15)",
+              "&:hover": { background: "rgba(255,255,255,0.25)" },
             }}
           >
             <X size={24} />
