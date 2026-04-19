@@ -118,48 +118,46 @@ export const OptimizedTabContent = ({ analysisResult, selectedColor, setSelected
               const isSelected = selectedColor?.hex === color.hex;
               return (
                 <motion.div
-                  key={i} whileHover={{ y: -2 }} whileTap={{ scale: 0.98 }} onClick={() => setSelectedColor(color)}
+                  key={i} whileHover={{ y: -2 }} 
                   style={{
-                    borderRadius: 12, padding: "16px", display: "flex", alignItems: "center", gap: "16px",
-                    cursor: "pointer", background: isSelected ? "var(--accent-subtle)" : "var(--bg-surface)",
+                    borderRadius: 12, 
+                    background: isSelected ? "var(--accent-subtle)" : "var(--bg-surface)",
                     border: `1px solid ${isSelected ? "var(--accent)" : "var(--border-glass)"}`,
                     boxShadow: isSelected ? "0 4px 20px var(--accent-glow)" : "none",
                     position: "relative", overflow: "hidden", transition: "all 0.25s ease",
                   }}
                 >
-                  <Box sx={{ width: 48, height: 48, borderRadius: "50%", backgroundColor: color.hex, border: "1px solid var(--border-glass)", boxShadow: `0 4px 12px ${color.hex}66`, flexShrink: 0 }} />
-                  <Box sx={{ flex: 1, display: "flex", flexDirection: "column" }}>
-                    <Typography variant="caption" sx={{ color: "text.secondary", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.15em", fontSize: "0.65rem", mb: 0.3 }}>{color.role}</Typography>
-                    <Typography variant="body1" sx={{ color: "text.primary", fontWeight: 700, fontSize: "1.15rem", fontFamily: '"Playfair Display", serif' }}>{color.name}</Typography>
-                    <Typography variant="caption" sx={{ color: "text.secondary", fontFamily: '"Inter", monospace', fontSize: "0.85rem" }}>{color.hex}</Typography>
+                  <Box 
+                    onClick={() => setSelectedColor(isSelected ? null : color)}
+                    sx={{ padding: "16px", display: "flex", alignItems: "center", gap: "16px", cursor: "pointer" }}
+                  >
+                    <Box sx={{ width: 48, height: 48, borderRadius: "50%", backgroundColor: color.hex, border: "1px solid var(--border-glass)", boxShadow: `0 4px 12px ${color.hex}66`, flexShrink: 0 }} />
+                    <Box sx={{ flex: 1, display: "flex", flexDirection: "column" }}>
+                      <Typography variant="caption" sx={{ color: "text.secondary", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.15em", fontSize: "0.65rem", mb: 0.3 }}>{color.role}</Typography>
+                      <Typography variant="body1" sx={{ color: "text.primary", fontWeight: 700, fontSize: "1.15rem", fontFamily: '"Playfair Display", serif' }}>{color.name}</Typography>
+                      <Typography variant="caption" sx={{ color: "text.secondary", fontFamily: '"Inter", monospace', fontSize: "0.85rem" }}>{color.hex}</Typography>
+                    </Box>
+                    <Box sx={{ color: isSelected ? "var(--accent)" : "text.secondary", display: "flex", transition: "transform 0.3s", transform: isSelected ? "rotate(180deg)" : "rotate(0deg)" }}>
+                       <ChevronDown size={20} />
+                    </Box>
                   </Box>
-                  {isSelected && <Box sx={{ color: "var(--accent)", display: "flex" }}><CheckCircle size={20} /></Box>}
+
+                  <Collapse in={isSelected}>
+                    <Box sx={{ p: 2, pt: 0, pb: 2.5, position: "relative" }}>
+                      <Box sx={{ position: "absolute", top: 0, left: 16, width: 3, height: "calc(100% - 24px)", bgcolor: color.hex, borderRadius: 2 }} />
+                      <Typography variant="body2" sx={{ fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.06em", fontSize: "0.85rem", mb: 1, pl: 2.5, color: "text.primary", display: "flex", alignItems: "center", gap: 1 }}>
+                        <Box sx={{ width: 12, height: 12, borderRadius: "50%", bgcolor: color.hex, border: `1px solid ${borderCol}`, flexShrink: 0 }} />
+                        Công thức: {color.name}
+                      </Typography>
+                      <Typography variant="body2" sx={{ color: "text.secondary", lineHeight: 1.8, fontFamily: '"Playfair Display", serif', fontStyle: "italic", pl: 2.5, fontSize: "1.1rem" }}>
+                        {color.mixingGuide}
+                      </Typography>
+                    </Box>
+                  </Collapse>
                 </motion.div>
               );
             })}
           </Box>
-
-          <AnimatePresence mode="wait">
-            {selectedColor && (
-              <motion.div
-                key={selectedColor.hex}
-                initial={{ opacity: 0, x: 16 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -16 }} transition={{ duration: 0.22 }}
-              >
-                <GlassCard sx={{ p: 3, position: "relative", overflow: "hidden" }}>
-                  <Box sx={{ position: "absolute", top: 0, left: 0, width: 3, height: "100%", bgcolor: selectedColor.hex }} />
-                  <Box sx={{ display: "flex", alignItems: "center", gap: 1.5, mb: 1.5, pl: 1 }}>
-                    <Box sx={{ width: 20, height: 20, borderRadius: "50%", bgcolor: selectedColor.hex, border: `2px solid ${borderCol}`, flexShrink: 0 }} />
-                    <Typography variant="body2" sx={{ fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.06em", fontSize: "0.95rem" }}>
-                      Công thức: {selectedColor.name}
-                    </Typography>
-                  </Box>
-                  <Typography variant="body2" sx={{ color: "text.secondary", lineHeight: 1.8, fontFamily: '"Playfair Display", serif', fontStyle: "italic", pl: 1, fontSize: "1.2rem" }}>
-                    {selectedColor.mixingGuide}
-                  </Typography>
-                </GlassCard>
-              </motion.div>
-            )}
-          </AnimatePresence>
         </Box>
       </Box>
     </motion.div>
