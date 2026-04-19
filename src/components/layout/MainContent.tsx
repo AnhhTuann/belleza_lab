@@ -144,33 +144,40 @@ export const MainContent = ({
               </GlassCard>
 
               <motion.div
-                whileHover={{ scale: 1.005 }} whileTap={{ scale: 0.995 }}
+                whileHover={{ scale: 1.002 }} whileTap={{ scale: 0.998 }}
                 onClick={() => fileInputRef.current?.click()}
                 onDragOver={(e) => { e.preventDefault(); setIsDragging(true); }}
                 onDragLeave={(e) => { e.preventDefault(); setIsDragging(false); }}
                 onDrop={handleDrop}
                 style={{
-                  width: "100%", aspectRatio: "16/9", borderRadius: 12,
+                  width: "100%", 
+                  borderRadius: 16,
                   border: `2px dashed ${isDragging ? dragBorderCol : borderCol}`,
                   background: isDragging ? dragBg : "var(--glass-bg)",
-                  cursor: "pointer", display: "flex", flexDirection: "column",
-                  alignItems: "center", justifyContent: "center", position: "relative",
-                  overflow: "hidden", transition: "all 0.3s ease",
+                  cursor: "pointer", 
+                  display: "flex", 
+                  flexDirection: "column",
+                  alignItems: "center", 
+                  justifyContent: "center", 
+                  position: "relative",
+                  transition: "all 0.3s ease",
                   boxShadow: isDragging ? dragGlow : "none",
+                  padding: "60px 24px",
+                  minHeight: 360,
                 }}
               >
                 <input ref={fileInputRef} type="file" accept="image/*" onChange={handleFileChange} style={{ display: "none" }} />
                 <input ref={cameraInputRef} type="file" accept="image/*" capture="environment" onChange={handleFileChange} style={{ display: "none" }} />
                 {[
-                  { top: 14, left: 14, bt: true, bl: true },
-                  { top: 14, right: 14, bt: true, br: true },
-                  { bottom: 14, left: 14, bb: true, bl: true },
-                  { bottom: 14, right: 14, bb: true, br: true },
+                  { top: 18, left: 18, bt: true, bl: true },
+                  { top: 18, right: 18, bt: true, br: true },
+                  { bottom: 18, left: 18, bb: true, bl: true },
+                  { bottom: 18, right: 18, bb: true, br: true },
                 ].map((c: any, i) => (
                   <Box
                     key={i}
                     sx={{
-                      position: "absolute", width: 18, height: 18,
+                      position: "absolute", width: 24, height: 24,
                       ...(c.top !== undefined && { top: c.top }),
                       ...(c.bottom !== undefined && { bottom: c.bottom }),
                       ...(c.left !== undefined && { left: c.left }),
@@ -180,26 +187,49 @@ export const MainContent = ({
                       borderLeft: c.bl ? `2px solid ${isDragging ? dragBorderCol : borderCol}` : "none",
                       borderRight: c.br ? `2px solid ${isDragging ? dragBorderCol : borderCol}` : "none",
                       transition: "border-color 0.3s",
+                      opacity: 0.6
                     }}
                   />
                 ))}
-                <motion.div animate={isDragging ? { scale: [1, 1.15, 1] } : {}} transition={{ duration: 0.4 }}>
+                <motion.div animate={isDragging ? { scale: [1, 1.1, 1] } : {}} transition={{ duration: 0.4 }}>
                   <Box
                     sx={{
-                      width: 72, height: 72, borderRadius: "50%", background: "var(--accent-subtle)",
+                      width: 80, height: 80, borderRadius: "50%", background: "var(--accent-subtle)",
                       border: `1px solid ${isDragging ? accentCol : borderCol}`,
                       display: "flex", alignItems: "center", justifyContent: "center", mb: 3,
                       color: isDragging ? accentCol : "var(--text-secondary)", transition: "all 0.3s",
                     }}
                   >
-                    <UploadCloud size={32} />
+                    <UploadCloud size={36} />
                   </Box>
                 </motion.div>
-                <Typography variant="h6" sx={{ color: isDragging ? accentCol : "text.primary", mb: 0.5, fontWeight: 600, transition: "color 0.3s", fontSize: "1.1rem" }}>
-                  Phóng tác phẩm của bạn
+                <Typography 
+                  variant="h5" 
+                  sx={{ 
+                    color: isDragging ? accentCol : "text.primary", 
+                    mb: 1, 
+                    fontWeight: 700, 
+                    transition: "color 0.3s", 
+                    fontSize: { xs: "1.2rem", md: "1.4rem" },
+                    textAlign: "center",
+                    px: 2
+                  }}
+                >
+                  Phác họa tác phẩm của bạn
                 </Typography>
-                <Typography variant="body2" sx={{ color: "text.secondary", textTransform: "uppercase", letterSpacing: "0.12em", fontSize: "0.7rem", mb: 3 }}>
-                  Kéo thả hoặc nhấn để chọn ảnh
+                <Typography 
+                  variant="body2" 
+                  sx={{ 
+                    color: "text.secondary", 
+                    textTransform: "uppercase", 
+                    letterSpacing: "0.15em", 
+                    fontSize: "0.75rem", 
+                    mb: 4,
+                    textAlign: "center",
+                    maxWidth: "80%"
+                  }}
+                >
+                  Kéo thả hoặc nhấn để chọn ảnh từ thư viện
                 </Typography>
                 
                 <Box sx={{ display: "flex", gap: 2 }}>
@@ -211,11 +241,14 @@ export const MainContent = ({
                     sx={{ 
                       background: "var(--accent-subtle)", 
                       color: "var(--accent)", 
-                      border: `1px solid var(--accent)22`,
-                      px: 3
+                      border: `1px solid var(--accent)44`,
+                      px: 4,
+                      py: 1.2,
+                      fontWeight: 600,
+                      borderRadius: 2
                     }}
                   >
-                    <Camera size={18} style={{ marginRight: 8 }} /> Chụp ảnh
+                    <Camera size={18} style={{ marginRight: 10 }} /> Chụp ảnh ngay
                   </GhostButton>
                 </Box>
               </motion.div>
