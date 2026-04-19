@@ -143,15 +143,16 @@ export const MainContent = ({
                 </AnimatePresence>
               </GlassCard>
 
-              <motion.div
+              <Box
+                component={motion.div}
                 whileHover={{ scale: 1.002 }} whileTap={{ scale: 0.998 }}
                 onClick={() => fileInputRef.current?.click()}
-                onDragOver={(e) => { e.preventDefault(); setIsDragging(true); }}
-                onDragLeave={(e) => { e.preventDefault(); setIsDragging(false); }}
+                onDragOver={(e: React.DragEvent) => { e.preventDefault(); setIsDragging(true); }}
+                onDragLeave={(e: React.DragEvent) => { e.preventDefault(); setIsDragging(false); }}
                 onDrop={handleDrop}
-                style={{
+                sx={{
                   width: "100%", 
-                  borderRadius: 16,
+                  borderRadius: 4,
                   border: `2px dashed ${isDragging ? dragBorderCol : borderCol}`,
                   background: isDragging ? dragBg : "var(--glass-bg)",
                   cursor: "pointer", 
@@ -162,8 +163,8 @@ export const MainContent = ({
                   position: "relative",
                   transition: "all 0.3s ease",
                   boxShadow: isDragging ? dragGlow : "none",
-                  padding: "60px 24px",
-                  minHeight: 360,
+                  padding: { xs: "36px 16px", sm: "60px 24px" },
+                  minHeight: { xs: 240, sm: 360 },
                 }}
               >
                 <input ref={fileInputRef} type="file" accept="image/*" onChange={handleFileChange} style={{ display: "none" }} />
@@ -194,13 +195,13 @@ export const MainContent = ({
                 <motion.div animate={isDragging ? { scale: [1, 1.1, 1] } : {}} transition={{ duration: 0.4 }}>
                   <Box
                     sx={{
-                      width: 80, height: 80, borderRadius: "50%", background: "var(--accent-subtle)",
+                      width: { xs: 60, sm: 80 }, height: { xs: 60, sm: 80 }, borderRadius: "50%", background: "var(--accent-subtle)",
                       border: `1px solid ${isDragging ? accentCol : borderCol}`,
-                      display: "flex", alignItems: "center", justifyContent: "center", mb: 3,
+                      display: "flex", alignItems: "center", justifyContent: "center", mb: { xs: 2.5, sm: 3 },
                       color: isDragging ? accentCol : "var(--text-secondary)", transition: "all 0.3s",
                     }}
                   >
-                    <UploadCloud size={36} />
+                    <UploadCloud size={32} />
                   </Box>
                 </motion.div>
                 <Typography 
@@ -223,8 +224,8 @@ export const MainContent = ({
                     color: "text.secondary", 
                     textTransform: "uppercase", 
                     letterSpacing: "0.15em", 
-                    fontSize: "0.75rem", 
-                    mb: 4,
+                    fontSize: { xs: "0.65rem", sm: "0.75rem" }, 
+                    mb: { xs: 3, sm: 4 },
                     textAlign: "center",
                     maxWidth: "80%"
                   }}
@@ -242,16 +243,17 @@ export const MainContent = ({
                       background: "var(--accent-subtle)", 
                       color: "var(--accent)", 
                       border: `1px solid var(--accent)44`,
-                      px: 4,
-                      py: 1.2,
+                      px: { xs: 3, sm: 4 },
+                      py: { xs: 1, sm: 1.2 },
                       fontWeight: 600,
-                      borderRadius: 2
+                      borderRadius: 2,
+                      fontSize: { xs: "0.85rem", sm: "0.95rem" }
                     }}
                   >
                     <Camera size={18} style={{ marginRight: 10 }} /> Chụp ảnh ngay
                   </GhostButton>
                 </Box>
-              </motion.div>
+              </Box>
             </motion.div>
           ) : (
             <motion.div key="preview" initial={{ opacity: 0, scale: 0.94 }} animate={{ opacity: 1, scale: 1 }} style={{ width: "100%" }}>
