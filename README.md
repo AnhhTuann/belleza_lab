@@ -30,15 +30,23 @@ View your app in AI Studio: [Belleza Lab](https://ai.studio/apps/f7f4f54b-ca10-4
    ```
 
 2. **Set the Gemini API Key:**
-   Create a `.env.local` file and add your key:
+   Create a `.env` file (the key stays server-side and is never shipped to the browser):
    ```env
    GEMINI_API_KEY=your_api_key_here
    ```
 
-3. **Run the app:**
+3. **Run the app (dev):**
    ```bash
    npm run dev
    ```
+   Vite dev server includes the `/api/analyze` and `/api/chat` endpoints, so no separate backend process is needed.
+
+4. **Production:**
+   ```bash
+   npm run build
+   npm start
+   ```
+   Express serves `dist/` and the API on `http://localhost:3000` (override with `PORT`).
 
 ---
 *Phát triển bởi Đội ngũ Belleza Lab - Nâng tầm nghệ thuật của bạn.*

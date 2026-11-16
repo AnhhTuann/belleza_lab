@@ -71,7 +71,7 @@ export const BelleChatBox = ({
         <Box sx={{ display: "flex", gap: 1 }}>
           <TextField
             fullWidth size="small" variant="outlined" placeholder="Hỏi Belle về hướng vẽ tiếp theo..."
-            value={chatInput} onChange={(e) => setChatInput(e.target.value)} onKeyPress={(e) => e.key === "Enter" && handleSendMessage(chatInput)}
+            value={chatInput} onChange={(e) => setChatInput(e.target.value)} onKeyDown={(e) => e.key === "Enter" && handleSendMessage(chatInput)}
             disabled={isChatting}
             sx={{
               "& .MuiOutlinedInput-root": {

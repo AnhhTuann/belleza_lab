@@ -148,12 +148,13 @@ export const PaletteCard = ({
             <Box
               sx={{
                 display: "flex",
+                flexWrap: "wrap",
                 justifyContent: "center",
                 gap: { xs: 1.5, sm: 3 },
                 mb: 5,
               }}
             >
-              {colors.slice(0, 5).map((c, i) => (
+              {colors.map((c, i) => (
                 <Box
                   key={i}
                   sx={{

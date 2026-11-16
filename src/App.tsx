@@ -1,5 +1,5 @@
 import React, { useMemo } from "react";
-import { ThemeProvider, CssBaseline, Box, Typography, Tabs, Tab, useMediaQuery, SwipeableDrawer, IconButton, Fab } from "@mui/material";
+import { ThemeProvider, CssBaseline, Box, Typography, Tabs, Tab, useMediaQuery, IconButton, Fab } from "@mui/material";
 import { motion, AnimatePresence } from "motion/react";
 import { Image as ImageIcon, Wand2, MessageCircle, X } from "lucide-react";
 
@@ -21,9 +21,13 @@ export default function App() {
   const [showMobileSidebar, setShowMobileSidebar] = React.useState(false);
   
   // Custom Hook composition
-  let setChatHistoryGlobal: React.Dispatch<React.SetStateAction<ChatMessage[]>> = () => {};
-  
-  const analyzerProps = useArtAnalyzer((fn) => setChatHistoryGlobal(fn));
+  const setChatHistoryRef = React.useRef<React.Dispatch<React.SetStateAction<ChatMessage[]>> | null>(null);
+  const setChatHistoryGlobal = React.useCallback(
+    (fn: React.SetStateAction<ChatMessage[]>) => setChatHistoryRef.current?.(fn),
+    [],
+  );
+
+  const analyzerProps = useArtAnalyzer(setChatHistoryGlobal);
   const {
     imageSrc, base64Image, mimeType, isDragging,
     isAnalyzing, analysisResult, error,
@@ -33,7 +37,9 @@ export default function App() {
   } = analyzerProps;
 
   const chatProps = useBelleChat(base64Image, mimeType, analysisResult);
-  setChatHistoryGlobal = chatProps.setChatHistory;
+  React.useEffect(() => {
+    setChatHistoryRef.current = chatProps.setChatHistory;
+  }, [chatProps.setChatHistory]);
 
   const {
     finalReviewText, showPaletteCard, setShowPaletteCard
