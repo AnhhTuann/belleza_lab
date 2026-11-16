@@ -29,15 +29,14 @@ done
 
 echo "📦 [5/5] Copy frontend dist lên Nginx root..."
 sudo mkdir -p "$FRONTEND_DIST"
-# Lấy dist từ trong Docker image (không cần build lại)
 CONTAINER=$(docker compose ps -q app)
-docker cp "$CONTAINER:/app/dist/." "$FRONTEND_DIST/"
+sudo docker cp "$CONTAINER:/app/dist/." "$FRONTEND_DIST/"
 sudo chown -R www-data:www-data "$FRONTEND_DIST"
+sudo nginx -t && sudo systemctl reload nginx
 
 echo ""
 echo "✅ Deploy hoàn thành!"
 echo "   Backend:  http://127.0.0.1:4000/healthz"
 echo "   Frontend: $FRONTEND_DIST"
 echo "   Site:     https://bellezalab.duckdns.org"
-echo ""
-echo "   Reload Nginx: sudo nginx -s reload"
+
