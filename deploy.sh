@@ -19,7 +19,7 @@ docker compose up -d
 echo "⏳ [4/5] Chờ backend healthy..."
 sleep 5
 for i in {1..12}; do
-    if curl -sf http://127.0.0.1:3000/healthz > /dev/null 2>&1; then
+    if curl -sf http://127.0.0.1:4000/healthz > /dev/null 2>&1; then
         echo "✅ Backend is up!"
         break
     fi
@@ -36,7 +36,7 @@ sudo chown -R www-data:www-data "$FRONTEND_DIST"
 
 echo ""
 echo "✅ Deploy hoàn thành!"
-echo "   Backend:  http://127.0.0.1:3000/healthz"
+echo "   Backend:  http://127.0.0.1:4000/healthz"
 echo "   Frontend: $FRONTEND_DIST"
 echo "   Site:     https://bellezalab.duckdns.org"
 echo ""
