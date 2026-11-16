@@ -31,7 +31,7 @@ export const MainContent = ({
         minHeight: { xs: imageSrc ? "auto" : "100vh", md: "100%" },
       }}
     >
-      <Box sx={{ width: "100%", maxWidth: 700, display: "flex", flexDirection: "column", alignItems: "center" }}>
+      <Box sx={{ width: "100%", maxWidth: 700, my: "auto", display: "flex", flexDirection: "column", alignItems: "center" }}>
         <motion.header
           initial={{ opacity: 0, y: -16 }}
           animate={{ opacity: 1, y: 0 }}

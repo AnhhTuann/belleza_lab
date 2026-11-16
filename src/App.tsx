@@ -237,7 +237,7 @@ function BellezaStudio({
                   transition={{ type: "spring", damping: 26, stiffness: 200 }}
                   sx={{
                     width: "100%", maxWidth: { xs: "100%", md: 460 }, height: { xs: "auto", md: "100vh" }, minHeight: { xs: "100vh", md: "auto" },
-                    overflowY: { xs: "visible", md: "auto" }, flexShrink: 0, display: "flex", flexDirection: "column",
+                    overflowY: { xs: "visible", md: "hidden" }, flexShrink: 0, display: "flex", flexDirection: "column",
                     background: "var(--sidebar-bg)", backdropFilter: "blur(40px)", 
                     borderLeft: { xs: "none", md: `1px solid ${borderCol}` }, borderTop: { xs: `1px solid ${borderCol}`, md: "none" },
                     boxShadow: `-16px 0 48px var(--sidebar-shadow)`, transition: "background 0.3s, border-color 0.3s",

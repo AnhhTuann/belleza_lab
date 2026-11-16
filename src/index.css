@@ -101,13 +101,21 @@
   box-sizing: border-box;
 }
 
+html {
+  overscroll-behavior-y: none;
+  scrollbar-gutter: stable;
+}
+
 html, body, #root {
-  height: 100%;
+  min-height: 100%;
   margin: 0;
   padding: 0;
 }
 
 body {
+  min-height: 100vh;
+  min-height: 100dvh;
+  overscroll-behavior-y: none;
   background:
     radial-gradient(ellipse at 12% 8%, var(--accent-subtle), transparent 34rem),
     radial-gradient(ellipse at 92% 88%, var(--accent-2-subtle), transparent 32rem),
@@ -756,29 +764,29 @@ body {
 .auth-card {
   position: relative;
   width: 100%;
-  max-width: 430px;
-  padding: 40px;
+  max-width: 410px;
+  padding: clamp(24px, 3vh, 32px) clamp(20px, 2.5vw, 32px);
   border: 1px solid var(--border-glass);
-  border-radius: 22px;
+  border-radius: 20px;
   background: var(--bg-surface-alpha);
-  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.24);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.22);
   backdrop-filter: blur(28px);
 }
 
 .auth-mark {
   display: grid;
-  width: 48px;
-  height: 48px;
-  margin-bottom: 24px;
+  width: 40px;
+  height: 40px;
+  margin-bottom: 12px;
   place-items: center;
   border: 1px solid var(--border-glass);
-  border-radius: 14px;
+  border-radius: 12px;
   background: var(--accent-subtle);
   color: var(--accent);
 }
 
 .auth-eyebrow {
-  margin-bottom: 10px !important;
+  margin-bottom: 6px !important;
   color: var(--text-muted);
   font-size: 0.65rem !important;
   font-weight: 600 !important;
@@ -786,24 +794,24 @@ body {
 }
 
 .auth-title {
-  margin-bottom: 10px !important;
+  margin-bottom: 6px !important;
   font-family: "Playfair Display", serif !important;
-  font-size: clamp(1.7rem, 6vw, 2.15rem) !important;
+  font-size: clamp(1.5rem, 3.5vw, 1.85rem) !important;
   font-weight: 600 !important;
   line-height: 1.2 !important;
 }
 
 .auth-description {
-  margin-bottom: 26px !important;
+  margin-bottom: 18px !important;
   color: var(--text-secondary);
-  font-size: 0.9rem !important;
-  line-height: 1.7 !important;
+  font-size: 0.86rem !important;
+  line-height: 1.6 !important;
 }
 
 .auth-form {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 12px;
 }
 
 .auth-form .MuiOutlinedInput-root {
@@ -942,7 +950,13 @@ body {
 }
 
 .auth-page {
-  padding: clamp(20px, 5vw, 64px);
+  min-height: 100vh;
+  min-height: 100dvh;
+  padding: clamp(16px, 3vh, 32px) clamp(16px, 4vw, 48px);
+  display: grid;
+  place-items: center;
+  overflow-x: hidden;
+  overflow-y: auto;
   background:
     radial-gradient(ellipse at 14% 12%, var(--accent-subtle), transparent 35rem),
     radial-gradient(ellipse at 86% 90%, var(--accent-2-subtle), transparent 34rem),
@@ -951,15 +965,15 @@ body {
 
 .auth-layout {
   display: grid;
-  width: min(100%, 1080px);
-  grid-template-columns: minmax(0, 1fr) minmax(370px, 430px);
+  width: min(100%, 1020px);
+  grid-template-columns: minmax(0, 1fr) minmax(360px, 410px);
   align-items: center;
-  gap: clamp(40px, 8vw, 108px);
+  gap: clamp(32px, 5vw, 64px);
 }
 
 .auth-story {
   min-width: 0;
-  padding: 24px 0;
+  padding: 0;
 }
 
 .auth-brand {
@@ -990,8 +1004,8 @@ body {
 }
 
 .auth-story-copy {
-  max-width: 510px;
-  margin: clamp(48px, 8vh, 84px) 0 36px;
+  max-width: 480px;
+  margin: clamp(16px, 2.5vh, 28px) 0 16px;
 }
 
 .auth-story-copy .auth-eyebrow {
@@ -999,31 +1013,31 @@ body {
 }
 
 .auth-story-title {
-  max-width: 500px;
-  margin: 0 0 18px !important;
+  max-width: 460px;
+  margin: 0 0 12px !important;
   color: var(--text-primary);
   font-family: "Playfair Display", serif !important;
-  font-size: clamp(2.6rem, 5.2vw, 4.5rem) !important;
+  font-size: clamp(2rem, 3.2vw, 3.2rem) !important;
   font-weight: 500 !important;
-  letter-spacing: -0.055em !important;
-  line-height: 1.06 !important;
+  letter-spacing: -0.04em !important;
+  line-height: 1.1 !important;
 }
 
 .auth-story-description {
-  max-width: 390px;
+  max-width: 380px;
   color: var(--text-secondary);
-  font-size: 1rem !important;
-  line-height: 1.8 !important;
+  font-size: 0.92rem !important;
+  line-height: 1.65 !important;
 }
 
 .auth-moodboard {
-  width: min(100%, 460px);
-  padding: 16px;
+  width: min(100%, 400px);
+  padding: 12px;
   border: 1px solid var(--border-glass);
-  border-radius: 22px;
+  border-radius: 18px;
   background: var(--bg-surface-alpha);
-  box-shadow: 0 22px 60px rgba(20, 24, 19, 0.10);
-  transform: rotate(-2deg);
+  box-shadow: 0 16px 48px rgba(20, 24, 19, 0.08);
+  transform: rotate(-1.5deg);
 }
 
 .moodboard-label {
@@ -1044,7 +1058,7 @@ body {
 
 .moodboard-art {
   position: relative;
-  height: clamp(150px, 22vh, 220px);
+  height: clamp(110px, 15vh, 160px);
   overflow: hidden;
   border-radius: 14px;
   background:

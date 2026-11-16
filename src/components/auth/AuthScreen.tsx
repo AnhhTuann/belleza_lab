@@ -21,7 +21,7 @@ const inputSx = {
     fontSize: "0.85rem",
     "&.Mui-focused": { color: "var(--accent)" },
   },
-  "& input": { color: "var(--text-primary)", fontSize: "0.92rem", py: "13px" },
+  "& input": { color: "var(--text-primary)", fontSize: "0.92rem", py: "10px" },
   "& input:-webkit-autofill": {
     WebkitBoxShadow: "0 0 0 100px var(--bg-surface) inset",
     WebkitTextFillColor: "var(--text-primary)",
@@ -73,9 +73,9 @@ export const AuthScreen = () => {
     <Box className="auth-page">
       <AuroraBackground />
       <motion.div
-        initial={{ opacity: 0, y: 32, scale: 0.97 }}
-        animate={{ opacity: 1, y: 0, scale: 1 }}
-        transition={{ type: "spring", stiffness: 120, damping: 20 }}
+        initial={{ opacity: 0, y: 14 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.35, ease: "easeOut" }}
         style={{ position: "relative", zIndex: 1, width: "100%", display: "flex", justifyContent: "center" }}
       >
         <Box className="auth-layout">
@@ -104,14 +104,8 @@ export const AuthScreen = () => {
           </Box>
 
           <Box className="auth-card">
-            <motion.div
-              initial={{ opacity: 0, scale: 0.6, rotate: -12 }}
-              animate={{ opacity: 1, scale: 1, rotate: 0 }}
-              transition={{ delay: 0.15, type: "spring", stiffness: 200, damping: 15 }}
-            >
-              <Box className="auth-mark"><Palette size={22} /></Box>
-            </motion.div>
-            <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.22 }}>
+            <Box className="auth-mark"><Palette size={20} /></Box>
+            <Box>
               <Typography className="auth-eyebrow">BELLEZA LAB · ART STUDIO</Typography>
               <Typography variant="h1" className="auth-title">
                 {isSignUp ? t("authCreateTitle") : t("authWelcomeBack")}
@@ -119,7 +113,7 @@ export const AuthScreen = () => {
               <Typography className="auth-description">
                 {t("authDescription")}
               </Typography>
-            </motion.div>
+            </Box>
 
             <Box component="form" onSubmit={handleSubmit} className="auth-form">
             <AnimatePresence initial={false}>
@@ -153,63 +147,59 @@ export const AuthScreen = () => {
                 </motion.div>
               )}
             </AnimatePresence>
-            <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}>
-              <TextField
-                label={t("email")}
-                type="email"
-                value={email}
-                onChange={(event) => setEmail(event.target.value)}
-                autoComplete="email"
-                required
-                fullWidth
-                sx={inputSx}
-                slotProps={{
-                  input: {
-                    startAdornment: (
-                      <InputAdornment position="start">
-                        <Mail size={16} style={{ color: "var(--text-muted)" }} />
-                      </InputAdornment>
-                    ),
-                  },
-                }}
-              />
-            </motion.div>
-            <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.38 }}>
-              <TextField
-                label={t("password")}
-                type={showPassword ? "text" : "password"}
-                value={password}
-                onChange={(event) => setPassword(event.target.value)}
-                autoComplete={isSignUp ? "new-password" : "current-password"}
-                slotProps={{
-                  htmlInput: { minLength: 8, maxLength: 128 },
-                  input: {
-                    startAdornment: (
-                      <InputAdornment position="start">
-                        <Lock size={16} style={{ color: "var(--text-muted)" }} />
-                      </InputAdornment>
-                    ),
-                    endAdornment: (
-                      <InputAdornment position="end">
-                        <IconButton
-                          size="small"
-                          aria-label={showPassword ? t("hidePassword") : t("showPassword")}
-                          onClick={() => setShowPassword((v) => !v)}
-                          edge="end"
-                          sx={{ color: "var(--text-muted)", "&:hover": { color: "var(--accent)" } }}
-                        >
-                          {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
-                        </IconButton>
-                      </InputAdornment>
-                    ),
-                  },
-                }}
-                helperText={isSignUp ? t("passwordHint") : undefined}
-                required
-                fullWidth
-                sx={inputSx}
-              />
-            </motion.div>
+            <TextField
+              label={t("email")}
+              type="email"
+              value={email}
+              onChange={(event) => setEmail(event.target.value)}
+              autoComplete="email"
+              required
+              fullWidth
+              sx={inputSx}
+              slotProps={{
+                input: {
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <Mail size={16} style={{ color: "var(--text-muted)" }} />
+                    </InputAdornment>
+                  ),
+                },
+              }}
+            />
+            <TextField
+              label={t("password")}
+              type={showPassword ? "text" : "password"}
+              value={password}
+              onChange={(event) => setPassword(event.target.value)}
+              autoComplete={isSignUp ? "new-password" : "current-password"}
+              slotProps={{
+                htmlInput: { minLength: 8, maxLength: 128 },
+                input: {
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <Lock size={16} style={{ color: "var(--text-muted)" }} />
+                    </InputAdornment>
+                  ),
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <IconButton
+                        size="small"
+                        aria-label={showPassword ? t("hidePassword") : t("showPassword")}
+                        onClick={() => setShowPassword((v) => !v)}
+                        edge="end"
+                        sx={{ color: "var(--text-muted)", "&:hover": { color: "var(--accent)" } }}
+                      >
+                        {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                      </IconButton>
+                    </InputAdornment>
+                  ),
+                },
+              }}
+              helperText={isSignUp ? t("passwordHint") : undefined}
+              required
+              fullWidth
+              sx={inputSx}
+            />
             <AnimatePresence initial={false}>
               {isSignUp && (
                 <motion.div
@@ -256,34 +246,30 @@ export const AuthScreen = () => {
                 </motion.div>
               )}
             </AnimatePresence>
-            <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.46 }}>
-              <Button
-                type="submit"
-                variant="contained"
-                disabled={isSubmitting}
-                fullWidth
-                className="auth-submit"
-                startIcon={isSubmitting ? <CircularProgress size={16} color="inherit" /> : <Sparkles size={16} />}
-              >
-                {isSubmitting ? t("processing") : isSignUp ? t("createAccount") : t("login")}
-              </Button>
-            </motion.div>
+            <Button
+              type="submit"
+              variant="contained"
+              disabled={isSubmitting}
+              fullWidth
+              className="auth-submit"
+              startIcon={isSubmitting ? <CircularProgress size={16} color="inherit" /> : <Sparkles size={16} />}
+            >
+              {isSubmitting ? t("processing") : isSignUp ? t("createAccount") : t("login")}
+            </Button>
             </Box>
 
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.55 }}>
-              <Typography className="auth-switch">
-                {isSignUp ? t("hasAccount") : t("noAccount")}{" "}
-                <button
-                  type="button"
-                  onClick={() => {
-                    setIsSignUp((value) => !value);
-                    setError("");
-                  }}
-                >
-                  {isSignUp ? t("login") : t("createAccount")}
-                </button>
-              </Typography>
-            </motion.div>
+            <Typography className="auth-switch">
+              {isSignUp ? t("hasAccount") : t("noAccount")}{" "}
+              <button
+                type="button"
+                onClick={() => {
+                  setIsSignUp((value) => !value);
+                  setError("");
+                }}
+              >
+                {isSignUp ? t("login") : t("createAccount")}
+              </button>
+            </Typography>
           </Box>
         </Box>
       </motion.div>
