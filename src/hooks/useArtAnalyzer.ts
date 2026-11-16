@@ -6,10 +6,14 @@ import {
   FinalPaletteColor,
   ChatMessage,
 } from "../services/geminiService";
+import type { Language } from "../i18n";
+import { useLanguage } from "../i18n";
 
 export const useArtAnalyzer = (
   setChatHistory: React.Dispatch<React.SetStateAction<ChatMessage[]>>,
+  language: Language,
 ) => {
+  const { t } = useLanguage();
   const [imageSrc, setImageSrc] = useState<string | null>(null);
   const [isDragging, setIsDragging] = useState(false);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
@@ -56,7 +60,7 @@ export const useArtAnalyzer = (
 
   const processFile = async (file: File) => {
     if (!file.type.startsWith("image/")) {
-      setError("Hãy chọn một file ảnh.");
+      setError(t("chooseImage"));
       return;
     }
     abortControllerRef.current?.abort();
@@ -88,6 +92,7 @@ export const useArtAnalyzer = (
             isSketch,
             selectedStyle,
             paintType,
+            language,
             signal,
           );
           setAnalysisResult(analysis);
@@ -95,7 +100,9 @@ export const useArtAnalyzer = (
             setChatHistory([
               {
                 role: "model",
-                text: `Chào bạn! Bức phác thảo này gợi cảm giác ${analysis.determined_mood}. Belle đã chọn bảng màu phong cách ${analysis.suggested_style}. Bạn thấy sao?`,
+                text: t("sketchGreeting")
+                  .replace("{mood}", analysis.determined_mood)
+                  .replace("{style}", analysis.suggested_style),
               },
             ]);
           }
@@ -106,7 +113,7 @@ export const useArtAnalyzer = (
         } catch (err: any) {
           if (err.name !== "AbortError") {
             console.error(err);
-            setError("Phân tích thất bại. Vui lòng thử lại.");
+            setError(err instanceof Error ? err.message : t("analysisFailure"));
           }
         } finally {
           if (!signal.aborted) setIsAnalyzing(false);
@@ -115,7 +122,7 @@ export const useArtAnalyzer = (
       reader.readAsDataURL(compressed);
     } catch (err) {
       console.error(err);
-      setError("Không thể xử lý ảnh.");
+      setError(t("imageProcessingFailure"));
       setIsAnalyzing(false);
     }
   };

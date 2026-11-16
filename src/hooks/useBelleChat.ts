@@ -1,11 +1,15 @@
 import { useState } from "react";
 import { chatWithBelle, ChatMessage, ArtAnalysisResult } from "../services/geminiService";
+import type { Language } from "../i18n";
+import { useLanguage } from "../i18n";
 
 export const useBelleChat = (
   base64Image: string | null, 
   mimeType: string | null, 
-  analysisResult: ArtAnalysisResult | null
+  analysisResult: ArtAnalysisResult | null,
+  language: Language,
 ) => {
+  const { t } = useLanguage();
   const [chatHistory, setChatHistory] = useState<ChatMessage[]>([]);
   const [isChatting, setIsChatting] = useState(false);
   const [finalReviewText, setFinalReviewText] = useState<string | null>(null);
@@ -21,7 +25,7 @@ export const useBelleChat = (
     )
       return;
     const userMessage = isFinalReview
-      ? "Tôi đã hoàn thành bức tranh này. Hãy cho tôi nhận xét cuối cùng nhé."
+      ? t("finalReviewMessage")
       : text.trim();
     
     setChatInput("");
@@ -30,7 +34,7 @@ export const useBelleChat = (
     
     try {
       const prompt = isFinalReview
-        ? "Bức tranh này đã hoàn thành. Với tư cách là Belle từ Belleza Lab, hãy đưa ra một lời nhận xét chuyên sâu, cấu trúc: Emotional Impact, Technical Skill, Overall Harmony, Exhibition Suggestion."
+        ? t("finalReviewPrompt")
         : userMessage;
       
       const responseText = await chatWithBelle(
@@ -39,6 +43,7 @@ export const useBelleChat = (
         base64Image,
         mimeType,
         analysisResult,
+        language,
       );
       
       setChatHistory((prev) => [
@@ -56,7 +61,10 @@ export const useBelleChat = (
         ...prev,
         {
           role: "model",
-          text: "Xin lỗi, Belle đang gặp sự cố. Bạn thử lại sau nhé!",
+          text:
+            err instanceof Error
+              ? err.message
+              : t("chatFailure"),
         },
       ]);
     } finally {

@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from "motion/react";
 import { AlertTriangle, Camera, ImagePlus, RefreshCw, UploadCloud } from "lucide-react";
 import { GlassCard, GhostButton } from "../ui/StyledComponents";
 import { ArtLoader } from "../ui/ArtLoader";
+import { useLanguage } from "../../i18n";
 
 export const MainContent = ({
   imageSrc, isDragging, isAnalyzing, error,
@@ -12,6 +13,8 @@ export const MainContent = ({
   handleDrop, handleFileChange, resetApp, setIsDragging,
   isDark, accentCol, dragBorderCol, dragBg, dragGlow, borderCol
 }: any) => {
+  const { t } = useLanguage();
+
   return (
     <Box
       component="main"
@@ -37,7 +40,7 @@ export const MainContent = ({
         >
           <Typography className="studio-eyebrow">
             <span className="studio-eyebrow-mark" />
-            KHÔNG GIAN SÁNG TẠO CÙNG BELLE
+            {t("studioEyebrow")}
           </Typography>
           <Typography
             variant="h1"
@@ -50,7 +53,7 @@ export const MainContent = ({
             variant="body1"
             sx={{ color: "text.secondary", maxWidth: 440, mx: "auto", lineHeight: 1.75, fontSize: { xs: "0.9rem", sm: "0.98rem" } }}
           >
-            Khám phá sắc màu và tìm cảm hứng mới cho tác phẩm của bạn.
+            {t("studioDescription")}
           </Typography>
         </motion.header>
 
@@ -71,9 +74,9 @@ export const MainContent = ({
                       <ImagePlus size={18} />
                     </Box>
                     <Box>
-                      <Typography sx={{ fontWeight: 600, fontSize: "0.92rem" }}>Chế độ phác thảo</Typography>
+                      <Typography sx={{ fontWeight: 600, fontSize: "0.92rem" }}>{t("sketchMode")}</Typography>
                       <Typography variant="caption" sx={{ color: "text.secondary", fontSize: "0.76rem" }}>
-                        Gợi ý màu sắc và cách phối màu
+                        {t("sketchModeHelp")}
                       </Typography>
                     </Box>
                   </Box>
@@ -83,10 +86,10 @@ export const MainContent = ({
                       <Switch
                         checked={isSketch}
                         onChange={(event) => setIsSketch(event.target.checked)}
-                        slotProps={{ input: { "aria-label": "Bật chế độ phác thảo" } }}
+                        slotProps={{ input: { "aria-label": t("enableSketchMode") } }}
                       />
                     }
-                    label={isSketch ? "Đang bật" : "Tắt"}
+                    label={isSketch ? t("enabled") : t("disabled")}
                     labelPlacement="start"
                   />
                 </Box>
@@ -102,22 +105,22 @@ export const MainContent = ({
                     >
                       <Box className="studio-options">
                         <Box className="studio-select-field">
-                          <Typography component="label" htmlFor="sketch-style">Phong cách</Typography>
+                          <Typography component="label" htmlFor="sketch-style">{t("style")}</Typography>
                           <Box
                             id="sketch-style"
                             component="select"
                             value={selectedStyle}
                             onChange={(event: React.ChangeEvent<HTMLSelectElement>) => setSelectedStyle(event.target.value)}
                           >
-                            <option value="Nhẹ nhàng (Pastel)">Nhẹ nhàng (Pastel)</option>
-                            <option value="Vui tươi">Vui tươi</option>
-                            <option value="U buồn">U buồn</option>
-                            <option value="Cổ điển">Cổ điển</option>
-                            <option value="Hiện đại">Hiện đại</option>
+                            <option value="Nhẹ nhàng (Pastel)">{t("gentleStyle")}</option>
+                            <option value="Vui tươi">{t("cheerfulStyle")}</option>
+                            <option value="U buồn">{t("moodyStyle")}</option>
+                            <option value="Cổ điển">{t("classicStyle")}</option>
+                            <option value="Hiện đại">{t("modernStyle")}</option>
                           </Box>
                         </Box>
                         <Box className="studio-select-field">
-                          <Typography component="label" htmlFor="paint-type">Chất liệu</Typography>
+                          <Typography component="label" htmlFor="paint-type">{t("material")}</Typography>
                           <Box
                             id="paint-type"
                             component="select"
@@ -153,33 +156,37 @@ export const MainContent = ({
                 onDrop={handleDrop}
                 role="button"
                 tabIndex={0}
-                aria-label="Chọn hoặc thả ảnh tác phẩm để bắt đầu phân tích"
+                aria-label={t("uploadArtwork")}
                 className={`upload-zone${isDragging ? " is-dragging" : ""}`}
                 sx={{
-                  borderColor: isDragging ? dragBorderCol : borderCol,
+                  borderColor: isDragging ? dragBorderCol : "var(--border-glass)",
                   background: isDragging ? dragBg : "var(--glass-bg)",
                   boxShadow: isDragging ? dragGlow : undefined,
                 }}
               >
+                <span className="upload-corner upload-corner-tl" aria-hidden="true" />
+                <span className="upload-corner upload-corner-tr" aria-hidden="true" />
+                <span className="upload-corner upload-corner-bl" aria-hidden="true" />
+                <span className="upload-corner upload-corner-br" aria-hidden="true" />
                 <input ref={fileInputRef} type="file" accept="image/*" onChange={handleFileChange} style={{ display: "none" }} />
                 <input ref={cameraInputRef} type="file" accept="image/*" capture="environment" onChange={handleFileChange} style={{ display: "none" }} />
                 <Box className="upload-icon" sx={{ color: isDragging ? accentCol : undefined }}>
                   <UploadCloud size={26} strokeWidth={1.7} />
                 </Box>
                 <Typography variant="h5" sx={{ fontSize: { xs: "1.18rem", sm: "1.35rem" }, mb: 0.75, textAlign: "center" }}>
-                  {isDragging ? "Thả tác phẩm của bạn tại đây" : "Bắt đầu với một tác phẩm"}
+                  {isDragging ? t("dropArtwork") : t("startArtwork")}
                 </Typography>
                 <Typography variant="body2" sx={{ color: "text.secondary", fontSize: "0.86rem", textAlign: "center", mb: 2.5 }}>
-                  Kéo thả ảnh vào đây hoặc nhấn để chọn từ thiết bị
+                  {t("dragUpload")}
                 </Typography>
                 <Box className="upload-hint">
                   <span>JPG</span><span>PNG</span><span>WEBP</span>
-                  <i /> Ảnh được tự động tối ưu
+                  <i /> {t("autoOptimize")}
                 </Box>
               </Box>
 
               <Box className="camera-action">
-                <Typography variant="caption" sx={{ color: "text.secondary" }}>Hoặc</Typography>
+                <Typography variant="caption" sx={{ color: "text.secondary" }}>{t("or")}</Typography>
                 <GhostButton
                   onClick={(event: React.MouseEvent) => {
                     event.stopPropagation();
@@ -188,21 +195,21 @@ export const MainContent = ({
                   startIcon={<Camera size={17} />}
                   sx={{ fontSize: "0.86rem", py: 0.85 }}
                 >
-                  Chụp ảnh
+                  {t("takePhoto")}
                 </GhostButton>
               </Box>
             </motion.div>
           ) : (
             <motion.div key="preview" initial={{ opacity: 0, scale: 0.94 }} animate={{ opacity: 1, scale: 1 }} style={{ width: "100%" }}>
-              <Box sx={{ position: "relative", borderRadius: 3, overflow: "hidden", border: `1px solid ${borderCol}`, boxShadow: isDark ? "0 24px 60px -12px rgba(0,0,0,0.6)" : "0 16px 48px -12px rgba(0,0,0,0.12)" }}>
-                <img src={imageSrc} alt="Tác phẩm đã tải lên" style={{ width: "100%", height: "auto", maxHeight: "70vh", objectFit: "contain", display: "block", background: "var(--img-preview-bg)" }} />
+              <Box sx={{ position: "relative", borderRadius: 3, overflow: "hidden", border: `1px solid ${borderCol}`, boxShadow: isDark ? "0 30px 80px -20px rgba(0,0,0,0.7), 0 0 0 1px rgba(227,192,120,0.05)" : "0 16px 48px -12px rgba(0,0,0,0.12)", transition: "box-shadow 0.4s ease" }}>
+                <img src={imageSrc} alt={t("uploadedArtwork")} style={{ width: "100%", height: "auto", maxHeight: "70vh", objectFit: "contain", display: "block", background: "var(--img-preview-bg)" }} />
                 <AnimatePresence>{isAnalyzing && <ArtLoader />}</AnimatePresence>
               </Box>
               {!isAnalyzing && (
                 <Zoom in>
                   <Box sx={{ mt: 3, display: "flex", justifyContent: "center" }}>
                     <GhostButton onClick={resetApp} size="large" startIcon={<motion.div whileHover={{ rotate: 180 }} transition={{ duration: 0.4 }}><RefreshCw size={18} /></motion.div>}>
-                      Phân tích tác phẩm khác
+                      {t("analyzeAnother")}
                     </GhostButton>
                   </Box>
                 </Zoom>

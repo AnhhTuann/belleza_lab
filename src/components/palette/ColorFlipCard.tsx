@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Box, Typography } from "@mui/material";
 import { motion, useMotionValue } from "motion/react";
 import { AlertTriangle, Droplet } from "lucide-react";
+import { useLanguage } from "../../i18n";
 
 const itemVariants = {
   hidden: { opacity: 0, y: 20, scale: 0.96 },
@@ -20,6 +21,7 @@ export const ColorFlipCard: React.FC<{ color: any; unfitInfo: any }> = ({
   const [isFlipped, setIsFlipped] = useState(false);
   const mx = useMotionValue(0);
   const my = useMotionValue(0);
+  const { t } = useLanguage();
 
   return (
     <motion.div
@@ -67,8 +69,8 @@ export const ColorFlipCard: React.FC<{ color: any; unfitInfo: any }> = ({
             alignItems: "center",
             justifyContent: "center",
             gap: 1.5,
-            "&:hover": { borderColor: "var(--accent)" },
-            transition: "all 0.25s",
+            "&:hover": { borderColor: "var(--accent)", boxShadow: `0 12px 36px -12px ${color.hex}55` },
+            transition: "all 0.3s ease",
           }}
         >
           <Box sx={{ position: "relative" }}>
@@ -139,7 +141,7 @@ export const ColorFlipCard: React.FC<{ color: any; unfitInfo: any }> = ({
               bottom: 10,
             }}
           >
-            Nhấn để xem công thức
+            {t("tapForFormula")}
           </Typography>
         </Box>
 
@@ -234,7 +236,7 @@ export const ColorFlipCard: React.FC<{ color: any; unfitInfo: any }> = ({
               gap: 0.5,
             }}
           >
-            <Droplet size={10} /> Công thức
+            <Droplet size={10} /> {t("formula")}
           </Typography>
           <Typography
             variant="caption"

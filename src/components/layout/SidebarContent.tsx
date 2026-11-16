@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from "motion/react";
 import { Droplet, Info, Palette, Sparkles, CheckCircle, ChevronDown, ChevronUp } from "lucide-react";
 import { GlassCard } from "../ui/StyledComponents";
 import { ColorFlipCard } from "../palette/ColorFlipCard";
+import { useLanguage } from "../../i18n";
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -12,6 +13,7 @@ const containerVariants = {
 
 export const CurrentTabContent = ({ isSketch, analysisResult, accentCol }: any) => {
   const [showGuide, setShowGuide] = React.useState(false);
+  const { t } = useLanguage();
 
   return (
     <motion.div
@@ -21,8 +23,8 @@ export const CurrentTabContent = ({ isSketch, analysisResult, accentCol }: any) 
     >
       <Box sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
         <Box>
-          <Typography variant="overline" sx={{ color: accentCol, letterSpacing: "0.15em", fontSize: "0.6rem", display: "flex", alignItems: "center", gap: 0.8, mb: 1.5, fontWeight: 600 }}>
-            <Droplet size={12} /> {isSketch ? "Chất liệu đề xuất" : "Chất liệu dự đoán"}
+          <Typography variant="overline" sx={{ color: accentCol, letterSpacing: "0.18em", fontFamily: '"Space Grotesk", sans-serif', fontSize: "0.6rem", display: "flex", alignItems: "center", gap: 0.8, mb: 1.5, fontWeight: 600 }}>
+            <Droplet size={12} /> {isSketch ? t("suggestedMedium") : t("predictedMedium")}
           </Typography>
           <GlassCard sx={{ p: 3, position: "relative", overflow: "hidden" }}>
             <Box sx={{ position: "absolute", top: 8, right: 8, opacity: 0.05 }}><Droplet size={56} /></Box>
@@ -36,8 +38,8 @@ export const CurrentTabContent = ({ isSketch, analysisResult, accentCol }: any) 
         {isSketch && analysisResult.placement_guide && (
           <Box>
             <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", mb: 1.5 }}>
-              <Typography variant="overline" sx={{ color: accentCol, letterSpacing: "0.15em", fontSize: "0.6rem", display: "flex", alignItems: "center", gap: 0.8, fontWeight: 600 }}>
-                <Info size={12} /> Hướng dẫn tô màu
+              <Typography variant="overline" sx={{ color: accentCol, letterSpacing: "0.18em", fontFamily: '"Space Grotesk", sans-serif', fontSize: "0.6rem", display: "flex", alignItems: "center", gap: 0.8, fontWeight: 600 }}>
+                <Info size={12} /> {t("placementGuide")}
               </Typography>
               <IconButton onClick={() => setShowGuide(!showGuide)} size="small" sx={{ color: accentCol, p: 0.5 }}>
                 {showGuide ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
@@ -54,8 +56,8 @@ export const CurrentTabContent = ({ isSketch, analysisResult, accentCol }: any) 
         )}
 
         <Box>
-          <Typography variant="overline" sx={{ color: accentCol, letterSpacing: "0.15em", fontSize: "0.6rem", display: "flex", alignItems: "center", gap: 0.8, mb: 1.5, fontWeight: 600 }}>
-            <Palette size={12} /> {isSketch ? "Bảng màu đề xuất" : "Bảng màu hiện tại"}
+          <Typography variant="overline" sx={{ color: accentCol, letterSpacing: "0.18em", fontFamily: '"Space Grotesk", sans-serif', fontSize: "0.6rem", display: "flex", alignItems: "center", gap: 0.8, mb: 1.5, fontWeight: 600 }}>
+            <Palette size={12} /> {isSketch ? t("suggestedPalette") : t("currentPalette")}
           </Typography>
           <motion.div variants={containerVariants} initial="hidden" animate="show" style={{ display: "grid", gridTemplateColumns: "1fr", gap: 10 }}>
             {analysisResult.current_colors.map((color: any, i: number) => {
@@ -71,6 +73,8 @@ export const CurrentTabContent = ({ isSketch, analysisResult, accentCol }: any) 
 
 // ... OptimizedTabContent
 export const OptimizedTabContent = ({ analysisResult, selectedColor, setSelectedColor, borderCol }: any) => {
+  const { t } = useLanguage();
+
   return (
     <motion.div
       key="optimized"
@@ -79,15 +83,15 @@ export const OptimizedTabContent = ({ analysisResult, selectedColor, setSelected
     >
       <Box sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
         <Box>
-          <Typography variant="overline" sx={{ color: "#6366f1", letterSpacing: "0.15em", fontSize: "0.65rem", display: "flex", alignItems: "center", gap: 0.8, mb: 1.5, fontWeight: 600 }}>
-            <Sparkles size={12} /> Lời khuyên từ Belle
+          <Typography variant="overline" sx={{ color: "var(--accent-2)", letterSpacing: "0.18em", fontFamily: '"Space Grotesk", sans-serif', fontSize: "0.65rem", display: "flex", alignItems: "center", gap: 0.8, mb: 1.5, fontWeight: 600 }}>
+            <Sparkles size={12} /> {t("belleAdvice")}
           </Typography>
           <GlassCard sx={{ p: 3 }}>
             <Typography variant="body2" sx={{ color: "text.secondary", lineHeight: 1.8, fontFamily: '"Playfair Display", serif', fontStyle: "italic", mb: 2.5, fontSize: "1.2rem" }}>
               {analysisResult.issue?.critique}
             </Typography>
-            <Typography variant="overline" sx={{ fontSize: "0.6rem", letterSpacing: "0.12em", color: "var(--text-muted)", display: "flex", alignItems: "center", gap: 0.5, mb: 1.5 }}>
-              <CheckCircle size={11} /> Thay thế đề xuất
+            <Typography variant="overline" sx={{ fontSize: "0.6rem", letterSpacing: "0.14em", fontFamily: '"Space Grotesk", sans-serif', color: "var(--text-muted)", display: "flex", alignItems: "center", gap: 0.5, mb: 1.5 }}>
+              <CheckCircle size={11} /> {t("suggestedReplacements")}
             </Typography>
             <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
               {analysisResult.suggestions?.replacement_colors?.map((color: any, i: number) => (
@@ -110,8 +114,8 @@ export const OptimizedTabContent = ({ analysisResult, selectedColor, setSelected
           </GlassCard>
         </Box>
         <Box>
-          <Typography variant="overline" sx={{ color: "#6366f1", letterSpacing: "0.15em", fontSize: "0.6rem", display: "flex", alignItems: "center", gap: 0.8, mb: 1.5, fontWeight: 600 }}>
-            <Palette size={12} /> Bảng màu Hoàn mỹ
+          <Typography variant="overline" sx={{ color: "var(--accent-2)", letterSpacing: "0.18em", fontFamily: '"Space Grotesk", sans-serif', fontSize: "0.6rem", display: "flex", alignItems: "center", gap: 0.8, mb: 1.5, fontWeight: 600 }}>
+            <Palette size={12} /> {t("perfectPalette")}
           </Typography>
           <Box sx={{ display: "grid", gridTemplateColumns: "1fr", gap: 1.5, mb: 2 }}>
             {analysisResult.suggestions?.final_palette?.map((color: any, i: number) => {
@@ -133,7 +137,7 @@ export const OptimizedTabContent = ({ analysisResult, selectedColor, setSelected
                   >
                     <Box sx={{ width: 48, height: 48, borderRadius: "50%", backgroundColor: color.hex, border: "1px solid var(--border-glass)", boxShadow: `0 4px 12px ${color.hex}66`, flexShrink: 0 }} />
                     <Box sx={{ flex: 1, display: "flex", flexDirection: "column" }}>
-                      <Typography variant="caption" sx={{ color: "text.secondary", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.15em", fontSize: "0.65rem", mb: 0.3 }}>{color.role}</Typography>
+                      <Typography variant="caption" sx={{ color: "text.secondary", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.18em", fontFamily: '"Space Grotesk", sans-serif', fontSize: "0.65rem", mb: 0.3 }}>{color.role}</Typography>
                       <Typography variant="body1" sx={{ color: "text.primary", fontWeight: 700, fontSize: "1.15rem", fontFamily: '"Playfair Display", serif' }}>{color.name}</Typography>
                       <Typography variant="caption" sx={{ color: "text.secondary", fontFamily: '"Inter", monospace', fontSize: "0.85rem" }}>{color.hex}</Typography>
                     </Box>
@@ -147,7 +151,7 @@ export const OptimizedTabContent = ({ analysisResult, selectedColor, setSelected
                       <Box sx={{ position: "absolute", top: 0, left: 16, width: 3, height: "calc(100% - 24px)", bgcolor: color.hex, borderRadius: 2 }} />
                       <Typography component="div" variant="body2" sx={{ fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.06em", fontSize: "0.85rem", mb: 1, pl: 2.5, color: "text.primary", display: "flex", alignItems: "center", gap: 1 }}>
                         <Box sx={{ width: 12, height: 12, borderRadius: "50%", bgcolor: color.hex, border: `1px solid ${borderCol}`, flexShrink: 0 }} />
-                        Công thức: {color.name}
+                        {t("formulaFor")} {color.name}
                       </Typography>
                       <Typography variant="body2" sx={{ color: "text.secondary", lineHeight: 1.8, fontFamily: '"Playfair Display", serif', fontStyle: "italic", pl: 2.5, fontSize: "1.1rem" }}>
                         {color.mixingGuide}

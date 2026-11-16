@@ -3,8 +3,40 @@ import type {
   ArtAnalysisResult,
   ChatMessage,
 } from "../src/services/geminiService";
+import type { Language } from "../src/i18n";
 
-const MODEL = "gemini-3-flash-preview";
+const MODEL = "gemini-3.1-flash-lite";
+
+export interface GeminiUsage {
+  inputTokens: number;
+  outputTokens: number;
+}
+
+export interface GeminiResult<T> {
+  result: T;
+  usage: GeminiUsage;
+}
+
+function getUsage(usageMetadata?: {
+  promptTokenCount?: number;
+  candidatesTokenCount?: number;
+  thoughtsTokenCount?: number;
+}): GeminiUsage | undefined {
+  if (
+    !usageMetadata ||
+    usageMetadata.promptTokenCount === undefined ||
+    usageMetadata.candidatesTokenCount === undefined
+  ) {
+    return undefined;
+  }
+
+  return {
+    inputTokens: usageMetadata.promptTokenCount ?? 0,
+    outputTokens:
+      (usageMetadata.candidatesTokenCount ?? 0) +
+      (usageMetadata.thoughtsTokenCount ?? 0),
+  };
+}
 
 function getClient(): GoogleGenAI {
   const apiKey = process.env.GEMINI_API_KEY;
@@ -20,8 +52,19 @@ export async function analyzeArt(
   isSketch: boolean,
   selectedStyle: string,
   paintType: string,
-): Promise<ArtAnalysisResult> {
+  language: Language,
+): Promise<GeminiResult<ArtAnalysisResult>> {
   const ai = getClient();
+  const outputLanguage = language === "en" ? "English" : "Vietnamese";
+  const localizedStyle = language === "en"
+    ? {
+        "Nhẹ nhàng (Pastel)": "Gentle (Pastel)",
+        "Vui tươi": "Cheerful",
+        "U buồn": "Moody",
+        "Cổ điển": "Classic",
+        "Hiện đại": "Modern",
+      }[selectedStyle] ?? selectedStyle
+    : selectedStyle;
 
   let promptText = "";
   let responseSchema: any = {};
@@ -33,23 +76,23 @@ Task: Analyze the provided sketch/line art and propose a complete, harmonious co
 Analysis Requirements:
 1. Mood Interpretation: Based on the lines (curved/sharp), subject matter, and composition, determine the inherent mood of the sketch.
 2. Color Strategy: Propose a primary, secondary, and accent color.
-3. The Proposed Palette: Provide a 6-color palette that fits the determined mood and a user-selected style ('${selectedStyle}'). Provide Hex codes and names.
-4. Mixing Guide (The "Lab" part): For EACH color, give a step-by-step mixing guide using physical paints for ${paintType} in Vietnamese:
+3. The Proposed Palette: Provide a 6-color palette that fits the determined mood and a user-selected style ('${localizedStyle}'). Provide Hex codes and names.
+4. Mixing Guide (The "Lab" part): For EACH color, give a step-by-step mixing guide using physical paints for ${paintType} in ${outputLanguage}:
    - Primary colors needed (e.g., Red, Yellow, Blue, White, Black).
    - Specific ratio (e.g., 2 parts White + 1 tiny drop of Cobalt Blue).
    - Tips for the specific medium (e.g., "For poster color, add a bit of water to keep it creamy").
 5. Color Placement Guide: Give brief suggestions on where to apply the main colors (e.g., "Use color #1 for the background, color #2 for the character's skin...").
 
-Output Format: Strict JSON matching the schema. Always respond in Vietnamese.`;
+Output Format: Strict JSON matching the schema. Always respond in ${outputLanguage}.`;
 
     responseSchema = {
       type: Type.OBJECT,
       properties: {
         is_sketch: { type: Type.BOOLEAN, description: "Always true" },
-        determined_mood: { type: Type.STRING, description: "Determined mood of the sketch in Vietnamese" },
-        suggested_style: { type: Type.STRING, description: "The suggested style based on user selection in Vietnamese" },
+        determined_mood: { type: Type.STRING, description: `Determined mood of the sketch in ${outputLanguage}` },
+        suggested_style: { type: Type.STRING, description: `The suggested style based on user selection in ${outputLanguage}` },
         medium: { type: Type.STRING, description: `The requested medium: ${paintType}` },
-        mediumDescription: { type: Type.STRING, description: "Brief description of the sketch lines in Vietnamese" },
+        mediumDescription: { type: Type.STRING, description: `Brief description of the sketch lines in ${outputLanguage}` },
         current_colors: {
           type: Type.ARRAY,
           items: {
@@ -63,7 +106,7 @@ Output Format: Strict JSON matching the schema. Always respond in Vietnamese.`;
             required: ["hex", "name", "role", "mixingGuide"]
           }
         },
-        placement_guide: { type: Type.STRING, description: "Guide on where to place colors in Vietnamese" },
+        placement_guide: { type: Type.STRING, description: `Guide on where to place colors in ${outputLanguage}` },
         issue: {
           type: Type.OBJECT,
           properties: {
@@ -86,19 +129,19 @@ Output Format: Strict JSON matching the schema. Always respond in Vietnamese.`;
 Task: Analyze the color harmony of the provided image. Identify "Off-colors" (colors that disrupt the harmony) and suggest "Perfect Replacements" to achieve a flawless palette.
 
 Analysis Requirements:
-1. Medium: Predict the medium used (e.g., Oil, Watercolor, Poster color, Digital art) and explain why in Vietnamese.
-2. Current Colors: Extract the dominant colors. For each, provide HEX, name in Vietnamese, and a detailed mixing guide using real-world paint names (e.g., Poster color D-A P&T, Titanium White) in Vietnamese.
-3. Disharmony Detection (Issue): Find 1-2 colors in the image that feel out of place or make the composition unbalanced. Explain why in Vietnamese.
-4. Professional Recommendation (Suggestions): Suggest 2-3 new replacement colors to balance the painting in Vietnamese.
-5. The "Perfect Palette": Combine the best existing colors with your suggestions to create a final, harmonious 6-color palette. For each, provide HEX, name, role (Main/Accent/Balance), and a detailed mixing guide in Vietnamese.
+1. Medium: Predict the medium used (e.g., Oil, Watercolor, Poster color, Digital art) and explain why in ${outputLanguage}.
+2. Current Colors: Extract the dominant colors. For each, provide HEX, name, and a detailed mixing guide using real-world paint names (e.g., Poster color D-A P&T, Titanium White) in ${outputLanguage}.
+3. Disharmony Detection (Issue): Find 1-2 colors in the image that feel out of place or make the composition unbalanced. Explain why in ${outputLanguage}.
+4. Professional Recommendation (Suggestions): Suggest 2-3 new replacement colors to balance the painting in ${outputLanguage}.
+5. The "Perfect Palette": Combine the best existing colors with your suggestions to create a final, harmonious 6-color palette. For each, provide HEX, name, role (Main/Accent/Balance), and a detailed mixing guide in ${outputLanguage}.
 
-Output Format: Strict JSON matching the schema. Do not include markdown formatting or extra text.`;
+Output Format: Strict JSON matching the schema. Do not include markdown formatting or extra text. Always write all human-readable values in ${outputLanguage}.`;
 
     responseSchema = {
       type: Type.OBJECT,
       properties: {
-        medium: { type: Type.STRING, description: "Predicted medium of the painting in Vietnamese" },
-        mediumDescription: { type: Type.STRING, description: "Brief explanation of why this medium was predicted in Vietnamese" },
+        medium: { type: Type.STRING, description: `Predicted medium of the painting in ${outputLanguage}` },
+        mediumDescription: { type: Type.STRING, description: `Brief explanation of why this medium was predicted in ${outputLanguage}` },
         current_colors: {
           type: Type.ARRAY,
           items: {
@@ -125,7 +168,7 @@ Output Format: Strict JSON matching the schema. Do not include markdown formatti
                 required: ["hex", "reason"]
               }
             },
-            critique: { type: Type.STRING, description: "Overall critique of the current harmony in Vietnamese" }
+            critique: { type: Type.STRING, description: `Overall critique of the current harmony in ${outputLanguage}` }
           },
           required: ["unfit_colors", "critique"]
         },
@@ -182,11 +225,15 @@ Output Format: Strict JSON matching the schema. Do not include markdown formatti
     config: {
       responseMimeType: "application/json",
       responseSchema: responseSchema,
+      maxOutputTokens: 1800,
     },
   });
 
   const jsonStr = response.text?.trim() || "{}";
-  return JSON.parse(jsonStr) as ArtAnalysisResult;
+  return {
+    result: JSON.parse(jsonStr) as ArtAnalysisResult,
+    usage: getUsage(response.usageMetadata) ?? { inputTokens: 12000, outputTokens: 1800 },
+  };
 }
 
 export async function chatWithBelle(
@@ -194,15 +241,17 @@ export async function chatWithBelle(
   history: ChatMessage[],
   base64Image: string,
   mimeType: string,
-  analysisResult: ArtAnalysisResult
-): Promise<string> {
+  analysisResult: ArtAnalysisResult,
+  language: Language,
+): Promise<GeminiResult<string>> {
   const ai = getClient();
+  const outputLanguage = language === "en" ? "English" : "Vietnamese";
 
   const systemInstruction = `Identity: Your name is Belle, the virtual muse of Belleza Lab.
 Personality: Sophisticated, encouraging, poetic yet technically skilled in painting (especially Poster colors and Digital art).
-Tone of Voice: Friendly (calling the user "Tuấn"), inspiring, and professional.
+Tone of Voice: Friendly, inspiring, and professional. Do not assume the user's name.
 Knowledge: You have access to the image analysis (colors, medium, harmony). When asked "Is this okay?", evaluate based on composition, color balance, and emotional impact.
-Always respond in Vietnamese. Keep responses concise and helpful.`;
+Always respond in ${outputLanguage}. Keep responses concise and helpful.`;
 
   const contents = [
     {
@@ -223,7 +272,9 @@ Always respond in Vietnamese. Keep responses concise and helpful.`;
       role: "model",
       parts: [
         {
-          text: "Chào Tuấn! Mình là Belle, nàng thơ ảo của Belleza Lab. Mình đã xem qua bức tranh và bảng màu. Bạn muốn mình tư vấn thêm về điều gì không?",
+          text: language === "en"
+            ? "Hello! I'm Belle, Belleza Lab's virtual muse. I've looked at your artwork and palette. What would you like to explore?"
+            : "Chào bạn! Mình là Belle, nàng thơ ảo của Belleza Lab. Mình đã xem qua bức tranh và bảng màu. Bạn muốn mình tư vấn thêm về điều gì không?",
         },
       ],
     },
@@ -242,8 +293,12 @@ Always respond in Vietnamese. Keep responses concise and helpful.`;
     contents: contents as any,
     config: {
       systemInstruction: systemInstruction,
+      maxOutputTokens: 350,
     },
   });
 
-  return response.text || "";
+  return {
+    result: response.text || "",
+    usage: getUsage(response.usageMetadata) ?? { inputTokens: 12000, outputTokens: 350 },
+  };
 }

@@ -1,3 +1,5 @@
+import type { Language } from "../i18n";
+
 export interface ColorInfo {
   hex: string;
   name: string;
@@ -53,8 +55,12 @@ async function postJson<T>(url: string, body: unknown, signal?: AbortSignal): Pr
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(body),
     signal,
+    credentials: "include",
   });
   if (!res.ok) {
+    if (res.status === 401 && typeof window !== "undefined") {
+      window.dispatchEvent(new Event("belleza:unauthorized"));
+    }
     const data = await res.json().catch(() => ({}));
     throw new Error(data.error || `Request failed with status ${res.status}`);
   }
@@ -67,11 +73,12 @@ export async function analyzeArt(
   isSketch: boolean = false,
   selectedStyle: string = "Gentle",
   paintType: string = "Poster Color",
+  language: Language = "vi",
   signal?: AbortSignal
 ): Promise<ArtAnalysisResult> {
   return postJson<ArtAnalysisResult>(
     "/api/analyze",
-    { base64Image, mimeType, isSketch, selectedStyle, paintType },
+    { base64Image, mimeType, isSketch, selectedStyle, paintType, language },
     signal,
   );
 }
@@ -82,11 +89,12 @@ export async function chatWithBelle(
   base64Image: string,
   mimeType: string,
   analysisResult: ArtAnalysisResult,
+  language: Language = "vi",
   signal?: AbortSignal
 ): Promise<string> {
   const data = await postJson<{ text: string }>(
     "/api/chat",
-    { message, history, base64Image, mimeType, analysisResult },
+    { message, history, base64Image, mimeType, analysisResult, language },
     signal,
   );
   return data.text;

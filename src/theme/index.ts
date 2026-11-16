@@ -1,31 +1,35 @@
 import { createTheme } from "@mui/material";
 
 export const DARK = {
-  bg: "#0A0A0A",
-  surface: "#171717",
-  surfaceAlpha: "rgba(23,23,23,0.75)",
-  accent: "#C29B7A",
-  accentHover: "#D1A98A",
-  text: "#F9FAFB",
-  textSec: "#D1D5DB",
-  glass: "rgba(0,0,0,0.40)",
-  glassBorder: "rgba(255,255,255,0.08)",
-  userBubble: "#1E3A8A",
-  sidebar: "rgba(10,10,10,0.92)",
+  bg: "#111512",
+  surface: "#191F1A",
+  surfaceAlpha: "rgba(25,31,26,0.82)",
+  accent: "#E39778",
+  accentHover: "#F0AD8E",
+  accentForeground: "#1D211D",
+  accent2: "#B6C5A7",
+  text: "#F6F1E9",
+  textSec: "#C0BDB3",
+  glass: "rgba(255,255,255,0.04)",
+  glassBorder: "rgba(255,255,255,0.10)",
+  userBubble: "#3B5141",
+  sidebar: "rgba(17,21,18,0.92)",
 };
 
 export const LIGHT = {
-  bg: "#FAFAFA",
-  surface: "#FFFFFF",
-  surfaceAlpha: "rgba(255,255,255,0.85)",
-  accent: "#111827",
-  accentHover: "#1F2937",
-  text: "#111827",
-  textSec: "#4B5563",
-  glass: "rgba(255,255,255,0.80)",
-  glassBorder: "rgba(0,0,0,0.05)",
-  userBubble: "#1E3A8A",
-  sidebar: "rgba(255,255,255,0.92)",
+  bg: "#F5F2EC",
+  surface: "#FFFDF9",
+  surfaceAlpha: "rgba(255,253,249,0.92)",
+  accent: "#A6503A",
+  accentHover: "#863F2F",
+  accentForeground: "#FFFDF9",
+  accent2: "#58715A",
+  text: "#272822",
+  textSec: "#66675D",
+  glass: "rgba(255,255,255,0.72)",
+  glassBorder: "rgba(54,47,38,0.10)",
+  userBubble: "#37513D",
+  sidebar: "rgba(255,253,249,0.94)",
 };
 
 export function buildTheme(mode: "dark" | "light") {
@@ -33,8 +37,8 @@ export function buildTheme(mode: "dark" | "light") {
   return createTheme({
     palette: {
       mode,
-      primary: { main: t.accent },
-      secondary: { main: "#6366f1" },
+      primary: { main: t.accent, contrastText: t.accentForeground },
+      secondary: { main: t.accent2 },
       background: { default: t.bg, paper: t.surfaceAlpha },
       text: { primary: t.text, secondary: t.textSec },
     },
@@ -49,7 +53,7 @@ export function buildTheme(mode: "dark" | "light") {
       body1: { fontSize: "1rem" },
       body2: { fontSize: "1rem" },
     },
-    shape: { borderRadius: 8 },
+    shape: { borderRadius: 10 },
     components: {
       MuiPaper: { styleOverrides: { root: { backgroundImage: "none" } } },
       MuiButton: {
@@ -68,6 +72,22 @@ export function buildTheme(mode: "dark" | "light") {
             textTransform: "none",
             fontWeight: 600,
             fontSize: "1rem",
+          },
+        },
+      },
+      MuiSwitch: {
+        styleOverrides: {
+          switchBase: {
+            color: t.accent,
+            "&.Mui-checked": { color: t.accent },
+            "&.Mui-checked + .MuiSwitch-track": {
+              backgroundColor: t.accent,
+              opacity: 0.5,
+            },
+          },
+          track: {
+            backgroundColor: "var(--border-glass)",
+            opacity: 1,
           },
         },
       },

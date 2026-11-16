@@ -4,6 +4,7 @@ import { motion } from "motion/react";
 import { toPng } from "html-to-image";
 import { Download, X } from "lucide-react";
 import { AccentButton } from "../ui/StyledComponents";
+import { useLanguage } from "../../i18n";
 
 export const PaletteCard = ({
   image,
@@ -16,6 +17,7 @@ export const PaletteCard = ({
   critique: string;
   onClose: () => void;
 }) => {
+  const { t } = useLanguage();
   const cardRef = useRef<HTMLDivElement>(null);
   const [isDownloading, setIsDownloading] = useState(false);
   const downloadCard = () => {
@@ -90,7 +92,7 @@ export const PaletteCard = ({
             sx={{
               width: "100%",
               p: { xs: 3, sm: 5 },
-              background: "var(--surface)",
+              background: "var(--bg-surface)",
               border: "1px solid var(--border-glass)",
               borderRadius: 4,
               position: "relative",
@@ -141,7 +143,7 @@ export const PaletteCard = ({
                   objectFit: "contain",
                   display: "block",
                 }}
-                alt="Artwork"
+                alt={t("uploadedArtwork")}
                 crossOrigin="anonymous"
               />
             </Box>
@@ -177,11 +179,27 @@ export const PaletteCard = ({
                   <Typography
                     variant="caption"
                     sx={{
-                      fontFamily: "monospace",
-                      fontSize: "0.8rem",
+                      fontFamily: '"Space Grotesk", sans-serif',
+                      fontSize: "0.72rem",
                       color: "var(--text-secondary)",
                       textTransform: "uppercase",
-                      fontWeight: 700,
+                      letterSpacing: "0.08em",
+                      fontWeight: 600,
+                      maxWidth: 72,
+                      textAlign: "center",
+                      overflow: "hidden",
+                      textOverflow: "ellipsis",
+                      whiteSpace: "nowrap",
+                    }}
+                  >
+                    {c.name || c.hex}
+                  </Typography>
+                  <Typography
+                    variant="caption"
+                    sx={{
+                      fontFamily: "monospace",
+                      fontSize: "0.68rem",
+                      color: "var(--text-muted)",
                     }}
                   >
                     {c.hex}
@@ -259,7 +277,7 @@ export const PaletteCard = ({
                   fontWeight: 600,
                 }}
               >
-                Analyzed by Belle · Art Intelligence
+                {t("analyzedBy")}
               </Typography>
               <Box
                 sx={{
@@ -284,7 +302,7 @@ export const PaletteCard = ({
               boxShadow: "0 8px 30px rgba(0,0,0,0.3)",
             }}
           >
-            {isDownloading ? "Đang tải..." : "Tải Thẻ Màu"}
+            {isDownloading ? t("downloading") : t("downloadPalette")}
           </AccentButton>
         </motion.div>
       </Box>

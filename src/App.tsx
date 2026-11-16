@@ -1,22 +1,99 @@
-import React, { useMemo } from "react";
-import { ThemeProvider, CssBaseline, Box, Typography, Tabs, Tab, useMediaQuery, IconButton, Fab } from "@mui/material";
+import React from "react";
+import { Alert, ThemeProvider, CssBaseline, Box, Typography, Tabs, Tab, useMediaQuery, IconButton, Fab, Snackbar, Button } from "@mui/material";
 import { motion, AnimatePresence } from "motion/react";
-import { Image as ImageIcon, Wand2, MessageCircle, X } from "lucide-react";
+import { Image as ImageIcon, LogOut, Wand2, MessageCircle, X } from "lucide-react";
 
 import { useAppTheme } from "./hooks/useAppTheme";
 import { useArtAnalyzer } from "./hooks/useArtAnalyzer";
 import { useBelleChat } from "./hooks/useBelleChat";
+import { authClient, useAuthSession } from "./services/authClient";
 
 import { AuroraBackground } from "./components/ui/AuroraBackground";
 import { ThemeToggle } from "./components/layout/ThemeToggle";
 import { MainContent } from "./components/layout/MainContent";
+import { AuthScreen } from "./components/auth/AuthScreen";
 import { BelleChatBox } from "./components/chat/BelleChatBox";
 import { CurrentTabContent, OptimizedTabContent } from "./components/layout/SidebarContent";
 import { PaletteCard } from "./components/palette/PaletteCard";
 import { FinalPaletteColor, ChatMessage } from "./services/geminiService";
+import { LanguageProvider, useLanguage } from "./i18n";
 
 export default function App() {
-  const { themeMode, theme, toggleTheme, isDark } = useAppTheme();
+  const themeState = useAppTheme();
+
+  return (
+    <ThemeProvider theme={themeState.theme}>
+      <CssBaseline />
+      <LanguageProvider>
+        <LocalizedApp themeState={themeState} />
+      </LanguageProvider>
+    </ThemeProvider>
+  );
+}
+
+function LocalizedApp({ themeState }: { themeState: ReturnType<typeof useAppTheme> }) {
+  const { language, setLanguage, t } = useLanguage();
+  const session = useAuthSession();
+  const [authError, setAuthError] = React.useState("");
+
+  React.useEffect(() => {
+    const onUnauthorized = () => void session.refetch?.();
+    window.addEventListener("belleza:unauthorized", onUnauthorized);
+    return () => window.removeEventListener("belleza:unauthorized", onUnauthorized);
+  }, [session.refetch]);
+
+  const handleSignOut = async () => {
+    try {
+      const result = await authClient.signOut({});
+      if (result.error) {
+        setAuthError(t("signOutFailure"));
+      }
+    } catch {
+      setAuthError(t("connectionFailure"));
+    }
+  };
+
+  return (
+    <>
+      <Button
+        className="language-toggle"
+        variant="outlined"
+        aria-label={language === "vi" ? t("switchToEnglish") : t("switchToVietnamese")}
+        title={language === "vi" ? t("switchToEnglish") : t("switchToVietnamese")}
+        onClick={() => setLanguage(language === "vi" ? "en" : "vi")}
+        sx={{
+          position: "fixed", top: 24, right: 80, zIndex: 100,
+          minWidth: 46, width: 46, height: 46, p: 0,
+          borderColor: "var(--border-glass)", borderRadius: "50%",
+          color: "var(--text-secondary)", background: "var(--glass-bg)",
+          backdropFilter: "blur(18px)", fontWeight: 700, fontSize: "0.72rem",
+        }}
+      >
+        {language === "vi" ? "EN" : "VI"}
+      </Button>
+      {session.isPending ? (
+        <Box className="auth-loading" role="status">{t("loadingSession")}</Box>
+      ) : session.data?.user ? (
+        <BellezaStudio {...themeState} userEmail={session.data.user.email} onSignOut={handleSignOut} />
+      ) : (
+        <AuthScreen />
+      )}
+      <Snackbar open={Boolean(authError)} autoHideDuration={5000} onClose={() => setAuthError("")}>
+        <Alert severity="error" onClose={() => setAuthError("")}>{authError}</Alert>
+      </Snackbar>
+    </>
+  );
+}
+
+function BellezaStudio({
+  themeMode,
+  theme,
+  toggleTheme,
+  isDark,
+  userEmail,
+  onSignOut,
+}: ReturnType<typeof useAppTheme> & { userEmail: string; onSignOut: () => void }) {
+  const { language, t } = useLanguage();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
   const [showMobileSidebar, setShowMobileSidebar] = React.useState(false);
   
@@ -27,7 +104,7 @@ export default function App() {
     [],
   );
 
-  const analyzerProps = useArtAnalyzer(setChatHistoryGlobal);
+  const analyzerProps = useArtAnalyzer(setChatHistoryGlobal, language);
   const {
     imageSrc, base64Image, mimeType, isDragging,
     isAnalyzing, analysisResult, error,
@@ -36,7 +113,7 @@ export default function App() {
     isSketch
   } = analyzerProps;
 
-  const chatProps = useBelleChat(base64Image, mimeType, analysisResult);
+  const chatProps = useBelleChat(base64Image, mimeType, analysisResult, language);
   React.useEffect(() => {
     setChatHistoryRef.current = chatProps.setChatHistory;
   }, [chatProps.setChatHistory]);
@@ -45,21 +122,21 @@ export default function App() {
     finalReviewText, showPaletteCard, setShowPaletteCard
   } = chatProps;
 
-  const borderCol = isDark ? "rgba(255,255,255,0.10)" : "rgba(0,0,0,0.08)";
-  const borderSubtle = isDark ? "rgba(255,255,255,0.05)" : "rgba(0,0,0,0.04)";
-  const accentCol = isDark ? "#D4AF37" : "#B8860B";
-  const dragBorderCol = isDark ? "#D4AF37" : "#B8860B";
-  const dragBg = isDark ? "rgba(212,175,55,0.05)" : "rgba(184,134,11,0.04)";
-  const dragGlow = isDark ? "0 0 40px rgba(212,175,55,0.15)" : "0 0 30px rgba(184,134,11,0.08)";
+  const borderCol = "var(--border-glass)";
+  const borderSubtle = "var(--border-subtle)";
+  const accentCol = "var(--accent)";
+  const dragBorderCol = "var(--accent)";
+  const dragBg = "var(--accent-subtle)";
+  const dragGlow = "0 0 50px var(--accent-glow)";
 
   const renderSidebarContent = () => (
     <Box sx={{ p: { xs: 2.5, md: 3.5 }, flex: 1, display: "flex", flexDirection: "column" }}>
       <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>
         <Box sx={{ display: "flex", alignItems: "center", gap: 1.5, mb: 3.5 }}>
-          <Box sx={{ p: 1, borderRadius: 2, background: "var(--accent-subtle)", border: `1px solid ${accentCol}22`, display: "flex" }}>
+          <Box sx={{ p: 1, borderRadius: 2, background: "var(--accent-subtle)", border: "1px solid var(--accent-glow)", display: "flex" }}>
             <ImageIcon size={20} style={{ color: accentCol }} />
           </Box>
-          <Typography variant="h5" sx={{ fontWeight: 700, fontSize: "1.35rem" }}>Khai phá Nghệ thuật</Typography>
+          <Typography variant="h5" sx={{ fontWeight: 700, fontSize: "1.35rem" }}>{t("workspaceTitle")}</Typography>
         </Box>
       </motion.div>
 
@@ -80,14 +157,14 @@ export default function App() {
               sx={{
                 minHeight: 38,
                 "& .MuiTab-root": { minHeight: 42, borderRadius: 2, color: "text.secondary", transition: "all 0.25s", fontSize: "1.05rem" },
-                "& .Mui-selected": { color: "#fff !important", background: `var(--accent) !important`, fontWeight: "700 !important" },
+                "& .Mui-selected": { color: "var(--accent-foreground) !important", background: `var(--accent) !important`, fontWeight: "700 !important" },
               }}
             >
-              <Tab value="current" label={isSketch ? "Bản vẽ" : "Hiện tại"} />
+              <Tab value="current" label={isSketch ? t("currentSketchTab") : t("currentTab")} />
               {!isSketch && (
-                <Tab value="optimized" label={<Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}><Wand2 size={13} /><span>Tối ưu</span></Box>} />
+                <Tab value="optimized" label={<Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}><Wand2 size={13} /><span>{t("optimizedTab")}</span></Box>} />
               )}
-              <Tab value="belle" label={<Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}><MessageCircle size={13} /><span>Belle</span></Box>} />
+              <Tab value="belle" label={<Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}><MessageCircle size={13} /><span>{t("belleTab")}</span></Box>} />
             </Tabs>
           </Box>
 
@@ -104,10 +181,26 @@ export default function App() {
   );
 
   return (
-    <ThemeProvider theme={theme}>
-      <CssBaseline />
+    <>
       <AuroraBackground />
       <ThemeToggle mode={themeMode} onToggle={toggleTheme} />
+      <IconButton
+      className="sign-out-button"
+      aria-label={`${t("signOut")} ${userEmail}`}
+      title={`${t("signOut")} ${userEmail}`}
+        onClick={onSignOut}
+        sx={{
+        position: "fixed", top: 24, right: 136, zIndex: 100,
+          width: 44, height: 44,
+          border: "1px solid var(--border-glass)",
+          background: "var(--glass-bg)",
+          color: "var(--text-secondary)",
+          backdropFilter: "blur(16px)",
+          "&:hover": { color: "var(--accent)", background: "var(--accent-subtle)" },
+        }}
+      >
+        <LogOut size={18} />
+      </IconButton>
 
       <AnimatePresence>
         {imageSrc && (
@@ -188,7 +281,7 @@ export default function App() {
                       >
                         <Box sx={{ position: "relative", width: "100%", display: "flex", justifyContent: "center", flexShrink: 0, pt: 1, pb: 1, cursor: "grab", "&:active": { cursor: "grabbing" } }}>
                           <Box sx={{ width: 48, height: 5, bgcolor: "text.disabled", borderRadius: 3, mt: 1, mb: 1, opacity: 0.8 }} />
-                          <IconButton aria-label="Đóng cửa sổ" onClick={() => setShowMobileSidebar(false)} sx={{ position: "absolute", top: 8, right: 12, color: "text.secondary" }}>
+                          <IconButton aria-label={t("closePanel")} onClick={() => setShowMobileSidebar(false)} sx={{ position: "absolute", top: 8, right: 12, color: "text.secondary" }}>
                             <X size={20} />
                           </IconButton>
                         </Box>
@@ -229,20 +322,20 @@ export default function App() {
           >
             <Fab
               variant="extended"
-              aria-label="Mở Phân Tích"
+              aria-label={t("openAnalysis")}
               onClick={() => setShowMobileSidebar(true)}
               sx={{
-                background: "var(--accent)", color: "var(--bg-surface)",
+                background: "var(--accent)", color: "var(--accent-foreground)",
                 boxShadow: "0 8px 32px var(--accent-glow)",
                 fontWeight: 700, px: 4, py: 3,
                 "&:hover": { background: "var(--accent-subtle)", color: "var(--accent)" }
               }}
             >
-              <Wand2 style={{ marginRight: 8 }} size={20} aria-hidden="true" /> Mở Phân Tích
+              <Wand2 style={{ marginRight: 8 }} size={20} aria-hidden="true" /> {t("openAnalysis")}
             </Fab>
           </motion.div>
         )}
       </AnimatePresence>
-    </ThemeProvider>
+    </>
   );
 }

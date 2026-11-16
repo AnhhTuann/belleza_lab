@@ -17,8 +17,9 @@ RUN npm ci --omit=dev && npm cache clean --force
 # Copy frontend build
 COPY --from=build /app/dist ./dist
 
-# Copy toàn bộ server
+# Copy toàn bộ server và src
 COPY --from=build /app/server ./server
+COPY --from=build /app/src ./src
 
 USER node
 EXPOSE 3000
