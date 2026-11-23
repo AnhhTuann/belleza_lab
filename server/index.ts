@@ -21,7 +21,7 @@ import type {
 import type { Language } from "../src/i18n";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const app = express();
+export const app = express();
 const PORT = Number(process.env.PORT) || 3001;
 const MAX_IMAGE_BASE64_LENGTH = 1_500_000;
 const MAX_ANALYSIS_JSON_LENGTH = 12_000;
@@ -310,7 +310,11 @@ async function start() {
   });
 }
 
-start().catch((error) => {
-  console.error("Could not start Belleza Lab server.", error);
-  process.exitCode = 1;
-});
+// Do not open a TCP port when imported by Vercel Functions.
+// The usage tables are provisioned separately with a reviewed migration.
+if (process.env.VERCEL !== "1") {
+  start().catch((error) => {
+    console.error("Could not start Belleza Lab server.", error);
+    process.exitCode = 1;
+  });
+}
