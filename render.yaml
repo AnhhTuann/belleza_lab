@@ -1,0 +1,24 @@
+# Render Blueprint for a single full-stack Belleza Lab service.
+# This does NOT create a production service until imported from a Render account.
+# Supply production secrets in Render (never commit them).
+services:
+  - type: web
+    name: belleza-lab
+    runtime: docker
+    plan: free
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    healthCheckPath: /healthz
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: DATABASE_URL
+        sync: false
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: BETTER_AUTH_SECRET
+        generateValue: true
+      - key: BETTER_AUTH_URL
+        sync: false
+      - key: APP_URL
+        sync: false
