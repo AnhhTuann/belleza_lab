@@ -103,6 +103,15 @@ app.get("/healthz", async (_req, res, next) => {
   }
 });
 
+app.get("/api/health", async (_req, res) => {
+  try {
+    await pool.query("SELECT 1");
+    res.json({ ok: true, database: "connected" });
+  } catch {
+    res.status(503).json({ ok: false, database: "unavailable" });
+  }
+});
+
 app.use("/api", async (req: Request, res: Response, next: NextFunction) => {
   try {
     const session = await auth.api.getSession({
