@@ -8,7 +8,9 @@ if (!connectionString) {
 
 export const pool = new Pool({
   connectionString,
-  max: Number(process.env.DB_POOL_SIZE) || 5,
+  max: Number(process.env.DB_POOL_SIZE) || (process.env.VERCEL === "1" ? 2 : 5),
+  idleTimeoutMillis: 5000,
+  connectionTimeoutMillis: 10000,
 });
 
 export async function initializeUsageSchema() {
