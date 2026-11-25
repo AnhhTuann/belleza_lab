@@ -1,6 +1,6 @@
 import "dotenv/config";
 import express, { type NextFunction, type Request, type Response } from "express";
-import { rateLimit } from "express-rate-limit";
+import { rateLimit, ipKeyGenerator } from "express-rate-limit";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { fromNodeHeaders, toNodeHandler } from "better-auth/node";
@@ -21,7 +21,11 @@ import type {
 import type { Language } from "../src/i18n";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const app = express();
+export const app = express();
+app.disable("x-powered-by");
+// Vercel forwards requests through one trusted edge hop.
+// Avoid trusting arbitrary client-supplied leftmost proxy headers.
+if (process.env.VERCEL === "1") app.set("trust proxy", 1);
 const PORT = Number(process.env.PORT) || 3001;
 const MAX_IMAGE_BASE64_LENGTH = 1_500_000;
 const MAX_ANALYSIS_JSON_LENGTH = 12_000;
@@ -88,6 +92,9 @@ app.all(
     limit: 40,
     standardHeaders: "draft-8",
     legacyHeaders: false,
+    // Express does not parse the RFC 7239 Forwarded header. Use Express\u0027s
+    // trusted-proxy IP and normalize IPv6 networks for safe rate limiting.
+    keyGenerator: (req) => ipKeyGenerator(req.ip || req.socket.remoteAddress || "unknown"),
   }),
   toNodeHandler(auth),
 );
@@ -100,6 +107,15 @@ app.get("/healthz", async (_req, res, next) => {
     res.json({ ok: true });
   } catch (error) {
     next(error);
+  }
+});
+
+app.get("/api/health", async (_req, res) => {
+  try {
+    await pool.query("SELECT 1");
+    res.json({ ok: true, database: "connected" });
+  } catch {
+    res.status(503).json({ ok: false, database: "unavailable" });
   }
 });
 
@@ -310,7 +326,11 @@ async function start() {
   });
 }
 
-start().catch((error) => {
-  console.error("Could not start Belleza Lab server.", error);
-  process.exitCode = 1;
-});
+// Do not open a TCP port when imported by Vercel Functions.
+// The usage tables are provisioned separately with a reviewed migration.
+if (process.env.VERCEL !== "1") {
+  start().catch((error) => {
+    console.error("Could not start Belleza Lab server.", error);
+    process.exitCode = 1;
+  });
+}
